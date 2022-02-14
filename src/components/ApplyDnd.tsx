@@ -1,7 +1,13 @@
 import React from 'react';
 
-export default function ApplyDnd(children): React.ReactNode {
+interface AcceptProps {
+  children?: React.ReactNode;
+}
+
+export default function ApplyDnd({ children }: AcceptProps): JSX.Element {
   return (
-    { children }
+    <React.Fragment>
+      { children }
+    </React.Fragment>
   );
 }
