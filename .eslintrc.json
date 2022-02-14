@@ -9,7 +9,7 @@
     "es2021": true
   },
   "globals": { "_": true },
-  "plugins": ["import", "html"],
+  "plugins": ["import"],
   "extends": ["airbnb-base", "prettier", "react-app"],
   "rules": {
     // "off" or 0 - turn the rule off
