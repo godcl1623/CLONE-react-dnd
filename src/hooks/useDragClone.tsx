@@ -1,14 +1,18 @@
-import { useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 export default function useDragClone() {
-  const itemContainer = useRef(null);
+  const [isDraggable, makeDraggable] = useState(true);
+  const dragTarget = useRef(null);
 
   useEffect(() => {
-    const dragItems = (itemContainer.current! as HTMLElement).childNodes;
-    dragItems.forEach(item => {
-      (item as HTMLElement).draggable = true;
+    const dragItems = dragTarget.current! as HTMLElement;
+    if (dragItems.children.length === 0) {
+      dragItems.draggable = isDraggable;
+    }
+    dragItems.childNodes.forEach(item => {
+      (item as HTMLElement).draggable = isDraggable;
     });
-  }, []);
+  }, [isDraggable]);
 
-  return [itemContainer];
+  return [dragTarget];
 }

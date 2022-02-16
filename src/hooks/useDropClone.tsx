@@ -1,12 +1,33 @@
 import { useEffect, useRef } from 'react';
 
-export default function useDropClone() {
-  const dropContainer = useRef(null);
+export interface IDropOptions {
+  disableParent?: boolean;
+  applyToChildren?: boolean;
+}
+
+export default function useDropClone(option: IDropOptions) {
+  const dropTarget = useRef(null);
+  const { disableParent, applyToChildren } = option;
 
   useEffect(() => {
-    const dropzoneRef = dropContainer.current! as HTMLElement;
-    dropzoneRef.addEventListener('drop', () => alert('foo'));
-    dropzoneRef.addEventListener('dragover', (e: DragEvent) => e.preventDefault());
+    const dropzoneRef = dropTarget.current! as HTMLElement;
+    if (disableParent && applyToChildren) {
+      dropzoneRef.childNodes.forEach(child => {
+        child.addEventListener('drop', (e: Event) => {
+          e.preventDefault();
+          e.stopPropagation();
+          alert('foo')
+        })
+        child.addEventListener('dragover', (e: Event) => e.preventDefault());
+      })
+    } else {
+      dropzoneRef.addEventListener('drop', (e: Event) => {
+        e.preventDefault();
+        e.stopPropagation();
+        alert('foo')
+      });
+      dropzoneRef.addEventListener('dragover', (e: DragEvent) => e.preventDefault());
+    }
 
     return () => {
       dropzoneRef.removeEventListener('drop', () => alert('foo'));
@@ -14,5 +35,5 @@ export default function useDropClone() {
     }
   }, []);
 
-  return [dropContainer];
+  return [dropTarget];
 }
