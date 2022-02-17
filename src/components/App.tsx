@@ -1,15 +1,23 @@
 import React from 'react';
 import '../styles/style.css';
 import useDropClone, { IDropOptions } from '../hooks/useDropClone';
-import useDragClone from '../hooks/useDragClone';
+import useDragClone, { IDragOptions } from '../hooks/useDragClone';
 
 export default function App() {
   const dropOptions: IDropOptions = {
     disableParent: true,
+    applyToChildren: true,
+    dropHandler: () => {
+      alert('foo');
+      alert('bar');
+    }
+  }
+  const dragOptions: IDragOptions = {
+    disableParent: true,
     applyToChildren: true
   }
   const [ dropTarget ] = useDropClone(dropOptions);
-  const [ dragTarget ] = useDragClone();
+  const [ dragTarget ] = useDragClone(dragOptions);
 
   const arr = [1, 2, 3, 4, 5];
   const children = arr.map(idx => 
