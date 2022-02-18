@@ -1,11 +1,19 @@
 import { useEffect, useRef } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { BasicDndOptions, HandlerTemplate } from '../components/CommonUtils';
+import { __TESTAction__ } from '../actions';
+import { RootState } from '../reducers';
 
 export type IDropOptions = BasicDndOptions;
 
 export default function useDropClone(option: IDropOptions) {
+  const _test = useSelector((state: RootState) => state.test);
   const dropTarget = useRef(null);
   const eventsList = ['drag', 'dragend', 'dragenter', 'dragexit', 'dragleave', 'dragover', 'dragstart', 'drop'];
+  const dispatch = useDispatch();
+
+  dispatch(__TESTAction__('dispatch test'));
+  console.log(_test)
 
   const {
     disableParent,

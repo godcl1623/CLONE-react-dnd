@@ -1,24 +1,8 @@
-import { BasicActionReturn } from '../components/CommonUtils';
+export const bar = 'foo';
 
-type ActionReturn<T> = BasicActionReturn<T>;
-
-function __TESTReducer(action: ActionReturn<any>, defaultState: any = null): any {
+export const __TESTReducer = (state: any = 'test', action: any) => {
   if (action.type === '__TEST__') {
     return action.payload;
   }
-  return defaultState;
+  return state;
 }
-
-function __TESTReducer2(action: ActionReturn<any>, defaultState: any = null): any {
-  if (action.type === '__TEST__') {
-    return action.payload;
-  }
-  return defaultState;
-}
-
-const reducers = {
-  __TESTReducer,
-  __TESTReducer2
-}
-
-export default reducers;

@@ -1,7 +1,10 @@
-import { combineReducers } from 'redux';
-import reducers from './reducer';
+import { combineReducers } from '@reduxjs/toolkit';
+import { __TESTReducer } from './reducer';
 
-export default combineReducers({
-  __TEST__: reducers.__TESTReducer,
-  __TEST2__: reducers.__TESTReducer2
-})
+export const doh = 'vah';
+
+export const rootReducer = combineReducers({
+  test: __TESTReducer
+});
+
+export type RootState = ReturnType<typeof rootReducer>;

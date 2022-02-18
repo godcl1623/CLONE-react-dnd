@@ -1,13 +1,6 @@
-import { BasicActionReturn } from '../components/CommonUtils';
+export const foo = 'bar';
 
-type ActionReturn<T> = BasicActionReturn<T>;
-
-export const __TEST__ = (any: any): ActionReturn<any> => ({
+export const __TESTAction__ = (any: any) => ({
   type: '__TEST__',
   payload: any
-});
-
-export const __TEST2__ = (any: any): ActionReturn<any> => ({
-  type: '__TEST2__',
-  payload: any
-});
+})
