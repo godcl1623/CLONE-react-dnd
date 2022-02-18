@@ -1,3 +1,8 @@
+export interface BasicActionReturn<T> {
+  type: string;
+  payload: T
+}
+
 export interface BasicDndOptions {
   disableParent?: boolean;
   applyToChildren?: boolean;
