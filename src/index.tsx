@@ -6,7 +6,8 @@ import App from './components/App';
 import { rootReducer } from './reducers';
 
 const root = document.querySelector('#root');
-const reduxStore = createStore(rootReducer);
+const composeEnhancers = (window as any).__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
+const reduxStore = createStore(rootReducer, composeEnhancers(applyMiddleware()));
 
 ReactDOM.render(
   <Provider store={reduxStore}>
