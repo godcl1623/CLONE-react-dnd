@@ -1,9 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import { BasicDndOptions, HandlerTemplate, HandlerTemplateOptions } from '../components/CommonUtils';
+import { RootState } from '../reducers';
 
 export type IDragOptions = Omit<BasicDndOptions, 'dropHandler'>;
 
 export default function useDragClone(option: IDragOptions) {
+  const currentDragTarget = useSelector((state: RootState) => state.currentDragTarget);
   const [isDraggable, makeDraggable] = useState(true);
   const dragTarget = useRef(null);
   const eventsList = ['drag', 'dragend', 'dragenter', 'dragexit', 'dragleave', 'dragover', 'dragstart'];
@@ -58,6 +61,15 @@ export default function useDragClone(option: IDragOptions) {
       });
     }
   }, [isDraggable]);
+
+  useEffect(() => {
+    if (currentDragTarget != null) {
+      const testObj = {
+        foo: 'bar'
+      }
+      currentDragTarget.dataset.test = `${testObj}`
+    }
+  }, [currentDragTarget])
 
   return [dragTarget];
 }

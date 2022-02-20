@@ -12,9 +12,6 @@ export default function useDropClone(option: IDropOptions) {
   const eventsList = ['drag', 'dragend', 'dragenter', 'dragexit', 'dragleave', 'dragover', 'dragstart', 'drop'];
   const dispatch = useDispatch();
 
-  dispatch(__TESTAction__('dispatch test'));
-  console.log(_test)
-
   const {
     disableParent,
     applyToChildren,

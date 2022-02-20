@@ -1,14 +1,19 @@
+export interface BasicActionCreator<T> {
+  type: string;
+  payload: T
+}
+
 export interface BasicDndOptions {
   disableParent?: boolean;
   applyToChildren?: boolean;
-  dragHandler?: () => void;
-  dragendHandler?: () => void;
-  dragenterHandler?: () => void;
-  dragexitHandler?: () => void;
-  dragleaveHandler?: () => void;
-  dragoverHandler?: () => void;
-  dragstartHandler?: () => void;
-  dropHandler?: () => void;
+  dragHandler?: (e: Event) => void;
+  dragendHandler?: (e: Event) => void;
+  dragenterHandler?: (e: Event) => void;
+  dragexitHandler?: (e: Event) => void;
+  dragleaveHandler?: (e: Event) => void;
+  dragoverHandler?: (e: Event) => void;
+  dragstartHandler?: (e: Event) => void;
+  dropHandler?: (e: Event) => void;
 }
 
 export interface HandlerTemplateOptions {
@@ -17,7 +22,7 @@ export interface HandlerTemplateOptions {
 }
 
 export class HandlerTemplate {
-  constructor(event: Event, handler: () => void, templateOptions?: HandlerTemplateOptions) {
+  constructor(event: Event, handler: (e: Event) => void, templateOptions?: HandlerTemplateOptions) {
     if (templateOptions != null) {
       const { disablePreventDefault, disableStopPropagation } = templateOptions;
       if (!disablePreventDefault) {
@@ -27,13 +32,13 @@ export class HandlerTemplate {
         event.preventDefault();
       }
       if (handler != null) {
-        handler();
+        handler(event);
       }
     } else {
       event.preventDefault();
       event.stopPropagation();
       if (handler != null) {
-        handler();
+        handler(event);
       }
     }
   }

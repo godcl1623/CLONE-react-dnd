@@ -1,20 +1,32 @@
 import React from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import '../styles/style.css';
 import useDropClone, { IDropOptions } from '../hooks/useDropClone';
 import useDragClone, { IDragOptions } from '../hooks/useDragClone';
+import { setCurrentDragTarget } from '../actions';
+import { RootState } from '../reducers';
+
+type TestType = {
+  foo: 'bar';
+}
 
 export default function App() {
+  const currentDragTarget = useSelector((state: RootState) => state.currentDragTarget);
+  const dispatch = useDispatch();
   const dropOptions: IDropOptions = {
     disableParent: true,
     applyToChildren: true,
-    dropHandler: () => {
-      alert('foo');
-      alert('bar');
+    dropHandler: (e: Event) => {
+      alert(e.target);
     }
   }
   const dragOptions: IDragOptions = {
     disableParent: true,
-    applyToChildren: true
+    applyToChildren: true,
+    dragstartHandler: (e: Event) => {
+      const HTMLEventTarget = e.target! as HTMLElement;
+      dispatch(setCurrentDragTarget(HTMLEventTarget));
+    }
   }
   const [ dropTarget ] = useDropClone(dropOptions);
   const [ dragTarget ] = useDragClone(dragOptions);
@@ -29,6 +41,10 @@ export default function App() {
       }}
     />
   );
+
+  React.useEffect(() => {
+    console.log(currentDragTarget)
+  }, [currentDragTarget]);
 
   return (
     <div id='App'>
