@@ -28,8 +28,8 @@ export default function App() {
       dispatch(setCurrentDragTarget(HTMLEventTarget));
     }
   }
-  const [ dropTarget ] = useDropClone(dropOptions);
-  const [ dragTarget ] = useDragClone(dragOptions);
+  const [ dropRef ] = useDropClone(dropOptions);
+  const [ dragRef ] = useDragClone(dragOptions);
 
   const arr = [1, 2, 3, 4, 5];
   const children = arr.map(idx => 
@@ -49,10 +49,10 @@ export default function App() {
   return (
     <div id='App'>
         <div id="dnd-test-zone">
-          <div id="dropzone" ref={dropTarget}>
+          <div id="dropzone" ref={dropRef}>
             {children}
           </div>
-          <div id="item-container" ref={dragTarget}>
+          <div id="item-container" ref={dragRef}>
             <div className="item" >item 1</div>
             <div className="item">item 2</div>
             <div className="item">item 3</div>

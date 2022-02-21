@@ -8,7 +8,7 @@ export type IDragOptions = Omit<BasicDndOptions, 'dropHandler'>;
 export default function useDragClone(option: IDragOptions) {
   const currentDragTarget = useSelector((state: RootState) => state.currentDragTarget);
   const [isDraggable, makeDraggable] = useState(true);
-  const dragTarget = useRef(null);
+  const dragRef = useRef(null);
   const eventsList = ['drag', 'dragend', 'dragenter', 'dragexit', 'dragleave', 'dragover', 'dragstart'];
 
   const {
@@ -39,7 +39,7 @@ export default function useDragClone(option: IDragOptions) {
   };
 
   useEffect(() => {
-    const dragItems = dragTarget.current! as HTMLElement;
+    const dragItems = dragRef.current! as HTMLElement;
     if (!disableParent && !applyToChildren) {
       dragItems.draggable = isDraggable;
       eventsList.forEach((event, idx) => {
@@ -71,5 +71,5 @@ export default function useDragClone(option: IDragOptions) {
     }
   }, [currentDragTarget])
 
-  return [dragTarget];
+  return [dragRef];
 }

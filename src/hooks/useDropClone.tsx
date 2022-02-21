@@ -8,7 +8,7 @@ export type IDropOptions = BasicDndOptions;
 
 export default function useDropClone(option: IDropOptions) {
   const _test = useSelector((state: RootState) => state.test);
-  const dropTarget = useRef(null);
+  const dropRef = useRef(null);
   const eventsList = ['drag', 'dragend', 'dragenter', 'dragexit', 'dragleave', 'dragover', 'dragstart', 'drop'];
   const dispatch = useDispatch();
 
@@ -37,7 +37,7 @@ export default function useDropClone(option: IDropOptions) {
   ];
 
   useEffect(() => {
-    const dropzoneRef = dropTarget.current! as HTMLElement;
+    const dropzoneRef = dropRef.current! as HTMLElement;
     if (disableParent && applyToChildren) {
       dropzoneRef.childNodes.forEach(child => {
         eventsList.forEach((event, idx) => {
@@ -65,5 +65,5 @@ export default function useDropClone(option: IDropOptions) {
     }
   }, []);
 
-  return [dropTarget];
+  return [dropRef];
 }
