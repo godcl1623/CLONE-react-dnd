@@ -6,12 +6,7 @@ import useDragClone, { IDragOptions } from '../hooks/useDragClone';
 import { setCurrentDragTarget } from '../actions';
 import { RootState } from '../reducers';
 
-type TestType = {
-  foo: 'bar';
-}
-
 export default function App() {
-  const currentDragTarget = useSelector((state: RootState) => state.currentDragTarget);
   const dispatch = useDispatch();
   const dropOptions: IDropOptions = {
     disableParent: true,
@@ -29,7 +24,8 @@ export default function App() {
     }
   }
   const [ dropRef ] = useDropClone(dropOptions);
-  const [ dragRef ] = useDragClone(dragOptions);
+  const [ dragRef, foo, bar ] = useDragClone(dragOptions);
+  console.log(bar != null ? bar.testObj : bar)
 
   const arr = [1, 2, 3, 4, 5];
   const children = arr.map(idx => 
@@ -41,10 +37,6 @@ export default function App() {
       }}
     />
   );
-
-  React.useEffect(() => {
-    console.log(currentDragTarget)
-  }, [currentDragTarget]);
 
   return (
     <div id='App'>

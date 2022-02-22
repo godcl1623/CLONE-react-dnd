@@ -5,9 +5,11 @@ import { RootState } from '../reducers';
 
 export type IDragOptions = Omit<BasicDndOptions, 'dropHandler'>;
 
-export default function useDragClone(option: IDragOptions) {
+export default function useDragClone(option: IDragOptions): any[] {
   const currentDragTarget = useSelector((state: RootState) => state.currentDragTarget);
+  const [test, setTest] = useState<any>(null);
   const [isDraggable, makeDraggable] = useState(true);
+  const [objTest, setObjTest] = useState<any>({});
   const dragRef = useRef(null);
   const eventsList = ['drag', 'dragend', 'dragenter', 'dragexit', 'dragleave', 'dragover', 'dragstart'];
 
@@ -64,12 +66,10 @@ export default function useDragClone(option: IDragOptions) {
 
   useEffect(() => {
     if (currentDragTarget != null) {
-      const testObj = {
-        foo: 'bar'
-      }
-      currentDragTarget.dataset.test = `${testObj}`
+      setTest(currentDragTarget)
+      setObjTest({...test, testObj: currentDragTarget.getBoundingClientRect()})
     }
   }, [currentDragTarget])
 
-  return [dragRef];
+  return [dragRef, test, objTest];
 }
