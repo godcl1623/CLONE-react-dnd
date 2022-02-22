@@ -20,10 +20,3 @@ export const DragCategoryReducer = (state: string | null = null, action: ReturnA
   }
   return state;
 };
-
-export const DropCategoryReducer = (state: string | null = null, action: ReturnAction<string>) => {
-  if (action.type === 'CURRENT_DRAG_CATEGORY_IS') {
-    return action.payload;
-  }
-  return state;
-};
