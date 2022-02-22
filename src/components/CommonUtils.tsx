@@ -4,6 +4,7 @@ export interface BasicActionCreator<T> {
 }
 
 export interface BasicDndOptions {
+  currentItemCategory?: string[];
   disableParent?: boolean;
   applyToChildren?: boolean;
   dragHandler?: (e: Event) => void;

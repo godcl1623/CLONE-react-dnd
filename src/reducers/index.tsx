@@ -1,9 +1,11 @@
 import { combineReducers } from '@reduxjs/toolkit';
-import { __TESTReducer, DragTargetReducer } from './reducer';
+import { __TESTReducer, DragTargetReducer, DragCategoryReducer, DropCategoryReducer } from './reducer';
 
 export const rootReducer = combineReducers({
   test: __TESTReducer,
-  currentDragTarget: DragTargetReducer
+  currentDragTarget: DragTargetReducer,
+  currentDragCategory: DragCategoryReducer,
+  currentDropCategory: DropCategoryReducer
 });
 
 export type RootState = ReturnType<typeof rootReducer>;

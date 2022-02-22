@@ -13,3 +13,17 @@ export const DragTargetReducer = (state: HTMLElement | null = null, action: Retu
   }
   return state;
 };
+
+export const DragCategoryReducer = (state: string | null = null, action: ReturnAction<string>) => {
+  if (action.type === 'CURRENT_DRAG_CATEGORY_IS') {
+    return action.payload;
+  }
+  return state;
+};
+
+export const DropCategoryReducer = (state: string | null = null, action: ReturnAction<string>) => {
+  if (action.type === 'CURRENT_DRAG_CATEGORY_IS') {
+    return action.payload;
+  }
+  return state;
+};
