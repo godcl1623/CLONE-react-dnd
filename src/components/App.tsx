@@ -17,7 +17,7 @@ export default function App() {
     }
   }
   const dragOptions: IDragOptions = {
-    currentItemCategory: ['test1', ['test2', 'foo'], 'test3'],
+    currentItemCategory: ['test1', 'test2', 'test3'],
     disableParent: true,
     applyToChildren: true,
     dragstartHandler: (e: Event) => {

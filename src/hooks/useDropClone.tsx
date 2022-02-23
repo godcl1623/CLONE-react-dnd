@@ -49,15 +49,17 @@ export default function useDropClone(option: IDropOptions): any {
           setDropCategory((currentItemCategory! as string[])[idx]);
         });
         // if (currentDragCategory === (currentItemCategory! as string[])[idx]) {
-        if (typeof (currentItemCategory! as string[])[idx] === 'string') {
-          if (currentDragCategory === (currentItemCategory! as string[])[idx]) {
-            child.addEventListener('drop', (e: Event) => {
-              if (dropHandler) {
-                dropHandler(e);
-              }
-            });
+        child.addEventListener('drop', (e: Event) => {
+          if (dropHandler) {
+            const condA = typeof (currentItemCategory! as string[])[idx] === 'string' && currentDragCategory === (currentItemCategory! as string[])[idx];
+            const condB = typeof (currentItemCategory! as string[])[idx] !== 'string' && (currentItemCategory! as string[])[idx].includes(currentDragCategory! as string);
+            if (condA || condB) {
+              console.log((currentItemCategory! as string[])[idx])
+              dropHandler(e);
+            } 
           }
-        }
+        });
+        // }
       });
       return () =>
         dropzoneRef.childNodes.forEach((child, idx) => {
