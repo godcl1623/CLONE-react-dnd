@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { BasicDndOptions, HandlerTemplate } from '../components/CommonUtils';
 import { __TESTAction__ } from '../actions';
@@ -35,83 +35,51 @@ export default function useDropClone(option: IDropOptions): any {
     dragleaveHandler,
     dragoverHandler,
     dragstartHandler,
-    dropHandler
+    dropHandler,
   ];
 
-  useEffect(() => {
-    const dropzoneRef = dropRef.current! as HTMLElement;
-    if (disableParent && applyToChildren) {
-      dropzoneRef.childNodes.forEach((child, idx) => {
-        eventsList.forEach((event, idx) => {
-          child.addEventListener(event, (e: Event) => new HandlerTemplate(e, handlerLists[idx]! as () => void));
-        });
-        child.addEventListener('dragenter', (e: Event) => {
-          setDropCategory((currentItemCategory! as string[])[idx]);
-        });
-        // if (currentDragCategory === (currentItemCategory! as string[])[idx]) {
-        child.addEventListener('drop', (e: Event) => {
-          if (dropHandler) {
-            const condA = typeof (currentItemCategory! as string[])[idx] === 'string' && currentDragCategory === (currentItemCategory! as string[])[idx];
-            const condB = typeof (currentItemCategory! as string[])[idx] !== 'string' && (currentItemCategory! as string[])[idx].includes(currentDragCategory! as string);
-            if (condA || condB) {
-              console.log((currentItemCategory! as string[])[idx])
-              dropHandler(e);
-            } 
-          }
-        });
-        // }
-      });
-      return () =>
-        dropzoneRef.childNodes.forEach((child, idx) => {
-          eventsList.forEach((event, idx) => {
-            child.removeEventListener(event, (e: Event) => new HandlerTemplate(e, handlerLists[idx]! as () => void));
-          });
-          child.removeEventListener('dragenter', (e: Event) => {
-            setDropCategory((currentItemCategory! as string[])[idx]);
-          });
-          if (currentDragCategory === (currentItemCategory! as string[])[idx]) {
-            child.removeEventListener('drop', (e: Event) => {
-              if (dropHandler) {
-                dropHandler(e);
-              }
-            });
-          }
-        });
-      // eslint-disable-next-line no-else-return
-    } else {
-      eventsList.forEach((event, idx) => {
-        dropzoneRef.addEventListener(event, (e: Event) => new HandlerTemplate(e, handlerLists[idx]! as () => void));
-      });
-      dropzoneRef.addEventListener('dragenter', (e: Event) => {
-        setDropCategory((currentItemCategory! as string[])[0]);
-      });
-      if (currentDragCategory === (currentItemCategory! as string[])[0]) {
-        dropzoneRef.addEventListener('drop', (e: Event) => {
+  const test = useCallback(
+    (e: Event) => {
+      if (typeof currentDropCategory === 'string') {
+        if (currentDropCategory === currentDragCategory) {
           if (dropHandler) {
             dropHandler(e);
           }
-        })
-      }
-      return () => {
-        eventsList.forEach((event, idx) => {
-          dropzoneRef.removeEventListener(
-            event,
-            (e: Event) => new HandlerTemplate(e, handlerLists[idx]! as () => void)
-          );
-        });
-        dropzoneRef.removeEventListener('dragenter', (e: Event) => {
-          setDropCategory((currentItemCategory! as string[])[0]);
-        });
-        if (currentDragCategory === (currentItemCategory! as string[])[0]) {
-          dropzoneRef.removeEventListener('drop', (e: Event) => {
-            if (dropHandler) {
-              dropHandler(e);
-            }
-          })
+        }
+      } else if (typeof currentDropCategory === 'object') {
+        if ((currentDropCategory! as string[]).includes(currentDragCategory! as string)) {
+          if (dropHandler) {
+            dropHandler(e);
+          }
         }
       }
+    },
+    [currentDragCategory, currentDropCategory]
+  );
+
+  useEffect(() => {
+    const dropzoneRef = dropRef.current! as HTMLElement;
+    dropzoneRef.childNodes.forEach((child, idx) => {
+      eventsList.forEach((evt, idx) => {
+        child.addEventListener(evt, (e: Event) => new HandlerTemplate(e, handlerLists[idx]! as () => void));
+      });
+      child.addEventListener('dragenter', (e: Event) => {
+        setDropCategory((currentItemCategory! as string[])[idx]);
+      });
+    });
+  }, []);
+
+  useEffect(() => {
+    const dropzoneRef = dropRef.current! as HTMLElement;
+    if (currentDropCategory) {
+      dropzoneRef.childNodes.forEach(child => child.addEventListener('drop', test));
     }
-  }, [currentDragCategory]);
+    return () => {
+      if (currentDropCategory) {
+        dropzoneRef.childNodes.forEach(child => child.removeEventListener('drop', test));
+      }
+    };
+  }, [test]);
 
   return [dropRef, currentDropCategory];
 }
