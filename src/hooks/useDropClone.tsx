@@ -1,39 +1,85 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { BasicDndOptions, HandlerTemplate } from '../components/CommonUtils';
+import { __TESTAction__ } from '../actions';
+import { RootState } from '../reducers';
 
-export interface IDropOptions {
-  disableParent?: boolean;
-  applyToChildren?: boolean;
-}
+export type IDropOptions = BasicDndOptions;
 
-export default function useDropClone(option: IDropOptions) {
-  const dropTarget = useRef(null);
-  const { disableParent, applyToChildren } = option;
+export default function useDropClone(option: IDropOptions): any {
+  const currentDragCategory = useSelector((state: RootState) => state.currentDragCategory);
+  const [currentDropCategory, setDropCategory] = useState<string | string[] | null>(null);
+  const dropRef = useRef(null);
+  const eventsList = ['drag', 'dragend', 'dragenter', 'dragexit', 'dragleave', 'dragover', 'dragstart'];
+  const dispatch = useDispatch();
+
+  const {
+    currentItemCategory,
+    disableParent,
+    applyToChildren,
+    dragHandler,
+    dragendHandler,
+    dragenterHandler,
+    dragexitHandler,
+    dragleaveHandler,
+    dragoverHandler,
+    dragstartHandler,
+    dropHandler,
+  } = option;
+
+  const handlerLists = [
+    dragHandler,
+    dragendHandler,
+    dragenterHandler,
+    dragexitHandler,
+    dragleaveHandler,
+    dragoverHandler,
+    dragstartHandler,
+    dropHandler,
+  ];
+
+  const test = useCallback(
+    (e: Event) => {
+      if (typeof currentDropCategory === 'string') {
+        if (currentDropCategory === currentDragCategory) {
+          if (dropHandler) {
+            dropHandler(e);
+          }
+        }
+      } else if (typeof currentDropCategory === 'object') {
+        if ((currentDropCategory! as string[]).includes(currentDragCategory! as string)) {
+          if (dropHandler) {
+            dropHandler(e);
+          }
+        }
+      }
+    },
+    [currentDragCategory, currentDropCategory]
+  );
 
   useEffect(() => {
-    const dropzoneRef = dropTarget.current! as HTMLElement;
-    if (disableParent && applyToChildren) {
-      dropzoneRef.childNodes.forEach(child => {
-        child.addEventListener('drop', (e: Event) => {
-          e.preventDefault();
-          e.stopPropagation();
-          alert('foo')
-        })
-        child.addEventListener('dragover', (e: Event) => e.preventDefault());
-      })
-    } else {
-      dropzoneRef.addEventListener('drop', (e: Event) => {
-        e.preventDefault();
-        e.stopPropagation();
-        alert('foo')
+    const dropzoneRef = dropRef.current! as HTMLElement;
+    dropzoneRef.childNodes.forEach((child, idx) => {
+      eventsList.forEach((evt, idx) => {
+        child.addEventListener(evt, (e: Event) => new HandlerTemplate(e, handlerLists[idx]! as () => void));
       });
-      dropzoneRef.addEventListener('dragover', (e: DragEvent) => e.preventDefault());
-    }
-
-    return () => {
-      dropzoneRef.removeEventListener('drop', () => alert('foo'));
-      dropzoneRef.removeEventListener('dragover', (e: DragEvent) => e.preventDefault());
-    }
+      child.addEventListener('dragenter', (e: Event) => {
+        setDropCategory((currentItemCategory! as string[])[idx]);
+      });
+    });
   }, []);
 
-  return [dropTarget];
+  useEffect(() => {
+    const dropzoneRef = dropRef.current! as HTMLElement;
+    if (currentDropCategory) {
+      dropzoneRef.childNodes.forEach(child => child.addEventListener('drop', test));
+    }
+    return () => {
+      if (currentDropCategory) {
+        dropzoneRef.childNodes.forEach(child => child.removeEventListener('drop', test));
+      }
+    };
+  }, [test]);
+
+  return [dropRef, currentDropCategory];
 }
