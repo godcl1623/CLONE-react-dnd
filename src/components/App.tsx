@@ -43,7 +43,10 @@ export default function App() {
     <div id='App'>
         <div id="dnd-test-zone">
           <div id="dropzone" ref={dropRef}>
-            {children}
+            {/* {children} */}
+            <div id="dropzone_first_child">
+              <div id="dropzone_second_child"></div>
+            </div>
           </div>
           <div id="item-container" ref={dragRef}>
             <div className="item" >item 1</div>

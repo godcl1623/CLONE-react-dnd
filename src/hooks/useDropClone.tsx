@@ -38,7 +38,7 @@ export default function useDropClone(option: IDropOptions): any {
     dropHandler,
   ];
 
-  const test = useCallback(
+  const dropHandlerWrapper = useCallback(
     (e: Event) => {
       if (typeof currentDropCategory === 'string') {
         if (currentDropCategory === currentDragCategory) {
@@ -72,14 +72,14 @@ export default function useDropClone(option: IDropOptions): any {
   useEffect(() => {
     const dropzoneRef = dropRef.current! as HTMLElement;
     if (currentDropCategory) {
-      dropzoneRef.childNodes.forEach(child => child.addEventListener('drop', test));
+      dropzoneRef.childNodes.forEach(child => child.addEventListener('drop', dropHandlerWrapper));
     }
     return () => {
       if (currentDropCategory) {
-        dropzoneRef.childNodes.forEach(child => child.removeEventListener('drop', test));
+        dropzoneRef.childNodes.forEach(child => child.removeEventListener('drop', dropHandlerWrapper));
       }
     };
-  }, [test]);
+  }, [dropHandlerWrapper]);
 
   return [dropRef, currentDropCategory];
 }
