@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { BasicDndOptions, HandlerTemplate } from '../components/CommonUtils';
-import { __TESTAction__ } from '../actions';
+import { setCurrentDropTarget, __TESTAction__ } from '../actions';
 import { RootState } from '../reducers';
 
 export type IDropOptions = BasicDndOptions;
@@ -59,27 +59,40 @@ export default function useDropClone(option: IDropOptions): any {
 
   useEffect(() => {
     const dropzoneRef = dropRef.current! as HTMLElement;
-    dropzoneRef.childNodes.forEach((child, idx) => {
-      eventsList.forEach((evt, idx) => {
-        child.addEventListener(evt, (e: Event) => new HandlerTemplate(e, handlerLists[idx]! as () => void));
-      });
-      child.addEventListener('dragenter', (e: Event) => {
-        setDropCategory((currentItemCategory! as string[])[idx]);
-      });
-    });
+    // dropzoneRef.childNodes.forEach((child, idx) => {
+    //   eventsList.forEach((evt, idx) => {
+    //     child.addEventListener(evt, (e: Event) => new HandlerTemplate(e, handlerLists[idx]! as () => void));
+    //   });
+    //   child.addEventListener('dragenter', (e: Event) => {
+    //     setDropCategory((currentItemCategory! as string[])[idx]);
+    //   });
+    // });
+    dropzoneRef.addEventListener('dragenter', (e: Event) => {
+      dispatch(setCurrentDropTarget(e.target! as HTMLElement));
+    })
   }, []);
-
+  const drop = useSelector((state: RootState) => state.currentDropTarget)
   useEffect(() => {
     const dropzoneRef = dropRef.current! as HTMLElement;
-    if (currentDropCategory) {
-      dropzoneRef.childNodes.forEach(child => child.addEventListener('drop', dropHandlerWrapper));
-    }
-    return () => {
-      if (currentDropCategory) {
-        dropzoneRef.childNodes.forEach(child => child.removeEventListener('drop', dropHandlerWrapper));
-      }
-    };
-  }, [dropHandlerWrapper]);
+    dropzoneRef.addEventListener('dragenter', (e: Event) => {
+      (e.target! as HTMLElement).style.background = 'black'
+    })
+    dropzoneRef.addEventListener('dragleave', (e: Event) => {
+      (e.target! as HTMLElement).style.background = 'white'
+    })
+  }, [drop])
+
+  // useEffect(() => {
+  //   const dropzoneRef = dropRef.current! as HTMLElement;
+  //   if (currentDropCategory) {
+  //     dropzoneRef.childNodes.forEach(child => child.addEventListener('drop', dropHandlerWrapper));
+  //   }
+  //   return () => {
+  //     if (currentDropCategory) {
+  //       dropzoneRef.childNodes.forEach(child => child.removeEventListener('drop', dropHandlerWrapper));
+  //     }
+  //   };
+  // }, [dropHandlerWrapper]);
 
   return [dropRef, currentDropCategory];
 }

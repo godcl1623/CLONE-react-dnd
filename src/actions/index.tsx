@@ -16,3 +16,8 @@ export const updateDragCategory = (category: string): ReturnAction<string> => ({
   type: 'CURRENT_DRAG_CATEGORY_IS',
   payload: category
 });
+
+export const setCurrentDropTarget = (dropTarget: HTMLElement | null): ReturnAction<HTMLElement | null> => ({
+  type: 'CURRENT_DROP_IS',
+  payload: dropTarget,
+});
