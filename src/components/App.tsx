@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import '../styles/style.css';
 import useDropClone, { IDropOptions } from '../hooks/useDropClone';
@@ -27,6 +27,10 @@ export default function App() {
   }
   const [ dropRef, doh ] = useDropClone(dropOptions);
   const [ dragRef, bar ] = useDragClone(dragOptions);
+
+  useEffect(() => {
+    console.log(doh)
+  }, [doh])
 
   const arr = [1, 2, 3, 4, 5];
   const children = arr.map(idx => 

@@ -45,7 +45,7 @@ export class HandlerTemplate {
   }
 }
 
-type Structure = Record<string, HTMLElement[]>
+export type Structure = Record<string, HTMLElement[]>
 export class CommonUtils {
   drawDropTargetMap = (node: HTMLElement, lvl: number): Structure => {
     const structure: Structure = {};
