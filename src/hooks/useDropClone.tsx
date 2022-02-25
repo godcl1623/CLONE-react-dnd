@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { BasicDndOptions, HandlerTemplate } from '../components/CommonUtils';
 import { setCurrentDropTarget, __TESTAction__ } from '../actions';
 import { RootState } from '../reducers';
+import { CommonUtils } from '../components/CommonUtils';
 
 export type IDropOptions = BasicDndOptions;
 
@@ -93,6 +94,13 @@ export default function useDropClone(option: IDropOptions): any {
   //     }
   //   };
   // }, [dropHandlerWrapper]);
+
+  useEffect(() => {
+    const utils = new CommonUtils();
+    if (dropRef.current) {
+      console.log(utils.drawDropTargetMap(dropRef.current, 0))
+    }
+  }, [dropRef.current])
 
   return [dropRef, currentDropCategory];
 }
