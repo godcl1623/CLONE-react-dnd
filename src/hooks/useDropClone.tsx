@@ -97,7 +97,7 @@ export default function useDropClone(option: IDropOptions): any {
 
   useEffect(() => {
     if (dropRef.current) {
-      dispatch(updateDropMap(utils.drawDropTargetMap(dropRef.current, 0)));
+      dispatch(updateDropMap(utils.drawDndTargetMap(dropRef.current, 0)));
     }
   }, [dropRef.current]);
   const dropMap = useSelector((state: RootState) => state.dropMap);
@@ -128,6 +128,18 @@ export default function useDropClone(option: IDropOptions): any {
     dropzoneRef.addEventListener('dragenter', updateDropInfo);
     return () => dropzoneRef.removeEventListener('dragenter', updateDropInfo);
   }, [updateDropInfo]);
+  const runDropHandler = useCallback((e: Event) => {
+    if (dropHandler) {
+      if (currentDragCategory === currentDropCategory) {
+        dropHandler(e);
+      }
+    }
+  }, [currentDragCategory, currentDropCategory]);
+  useEffect(() => {
+    const dropzoneRef = dropRef.current! as HTMLElement;
+    dropzoneRef.addEventListener('drop', runDropHandler);
+    return () => dropzoneRef.removeEventListener('drop', runDropHandler);
+  }, [runDropHandler])
 
   return [dropRef, currentDropLevel];
 }
