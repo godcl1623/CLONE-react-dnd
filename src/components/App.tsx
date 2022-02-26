@@ -9,7 +9,11 @@ import { RootState } from '../reducers';
 export default function App() {
   const dispatch = useDispatch();
   const dropOptions: IDropOptions = {
-    currentItemCategory: ['test1', ['test2', 'test1'], 'test3', 'test4', 'test5'],
+    currentItemCategory: {
+      level0: ['test1'],
+      level1: ['test2'],
+      level2: ['test3']
+    },
     disableParent: true,
     applyToChildren: true,
     dropHandler: (e: Event) => {
@@ -17,7 +21,9 @@ export default function App() {
     }
   }
   const dragOptions: IDragOptions = {
-    currentItemCategory: ['test1', 'test2', 'test3'],
+    currentItemCategory: {
+      level0: ['test1', 'test2', 'test3']
+    },
     disableParent: true,
     applyToChildren: true,
     dragstartHandler: (e: Event) => {
@@ -28,9 +34,9 @@ export default function App() {
   const [ dropRef, doh ] = useDropClone(dropOptions);
   const [ dragRef, bar ] = useDragClone(dragOptions);
 
-  useEffect(() => {
-    console.log(doh)
-  }, [doh])
+  // useEffect(() => {
+  //   console.log(doh)
+  // }, [doh])
 
   const arr = [1, 2, 3, 4, 5];
   const children = arr.map(idx => 

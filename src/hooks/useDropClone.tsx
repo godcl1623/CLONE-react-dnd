@@ -8,7 +8,7 @@ export type IDropOptions = BasicDndOptions;
 
 export default function useDropClone(option: IDropOptions): any {
   const currentDragCategory = useSelector((state: RootState) => state.currentDragCategory);
-  const [currentDropCategory, setDropCategory] = useState<string | string[] | null>(null);
+  const [currentDropCategory, setDropCategory] = useState<any>(null);
   const dropRef = useRef(null);
   const eventsList = ['drag', 'dragend', 'dragenter', 'dragexit', 'dragleave', 'dragover', 'dragstart'];
   const dispatch = useDispatch();
@@ -102,47 +102,32 @@ export default function useDropClone(option: IDropOptions): any {
   }, [dropRef.current]);
   const dropMap = useSelector((state: RootState) => state.dropMap);
   useEffect(() => {
-    // if (dropMap) {
-      // const allDropTargets = Object.values(dropMap);
-      // allDropTargets.forEach(dropTargetLevel => {
-      //   dropTargetLevel.forEach(dropTarget => {
-      //     eventsList.forEach((evt, idx) => {
-      //       dropTarget.addEventListener(evt, (e: Event) => new HandlerTemplate(e, handlerLists[idx]! as () => void));
-      //     });
-      //   });
-      // });
-      const dropzoneRef = dropRef.current! as HTMLElement;
-      eventsList.forEach((evt, idx) => {
-        dropzoneRef.addEventListener(evt, (e: Event) => new HandlerTemplate(e, handlerLists[idx]! as () => void));
-      });
-    // }
+    const dropzoneRef = dropRef.current! as HTMLElement;
+    eventsList.forEach((evt, idx) => {
+      dropzoneRef.addEventListener(evt, (e: Event) => new HandlerTemplate(e, handlerLists[idx]! as () => void));
+    });
   }, []);
-  const [testDropResult, setResult] = useState<number>(0)
-  const dropResult: any = {
-    lastDroppedLevel: 0
-  };
-  const testFunc = useCallback(
+  const [currentDropLevel, setDropLevel] = useState<number | null>(null);
+  const updateDropInfo = useCallback(
     (e: Event) => {
       if (dropMap) {
-        const levelIncludesDropTarget = Object.values(dropMap).find(level => level.includes(e.target! as HTMLElement))
+        const htmlTarget = e.target! as HTMLElement;
+        const levelIncludesDropTarget = Object.values(dropMap).find(level => level.includes(htmlTarget))
         const levelOfDropTarget = Object.values(dropMap).indexOf(levelIncludesDropTarget! as HTMLElement[]);
-        // if (levelOfDropTarget === 0) {
-        //   setResult(levelOfDropTarget)
-        // } else {
-        //   dropResult.lastDroppedLevel = levelOfDropTarget;
-        //   console.log(dropResult.lastDroppedLevel)
-        // }
-        setResult(levelOfDropTarget)
+        setDropLevel(levelOfDropTarget);
+        const targetIdxInNodes = Array.from((htmlTarget.parentNode! as HTMLElement).childNodes).indexOf(htmlTarget);
+        if (currentItemCategory) {
+          setDropCategory((Object.values(currentItemCategory)[levelOfDropTarget])[targetIdxInNodes]);
+        }
       }
     },
     [dropMap]
   );
   useEffect(() => {
     const dropzoneRef = dropRef.current! as HTMLElement;
-    dropzoneRef.addEventListener('drop', testFunc);
-    return () => dropzoneRef.removeEventListener('drop', testFunc);
-  }, [testFunc]);
-  // }, [dropMap])
+    dropzoneRef.addEventListener('dragenter', updateDropInfo);
+    return () => dropzoneRef.removeEventListener('dragenter', updateDropInfo);
+  }, [updateDropInfo]);
 
-  return [dropRef, testDropResult];
+  return [dropRef, currentDropLevel];
 }

@@ -3,8 +3,11 @@ export interface BasicActionCreator<T> {
   payload: T
 }
 
+type ItemCategory = Record<string, string[]>;
+
 export interface BasicDndOptions {
-  currentItemCategory?: (string | string[])[];
+  // currentItemCategory?: (string | string[])[];
+  currentItemCategory?: ItemCategory | (string | string[])[];
   disableParent?: boolean;
   applyToChildren?: boolean;
   dragHandler?: (e: Event) => void;
