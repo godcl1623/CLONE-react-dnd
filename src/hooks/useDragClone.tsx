@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { BasicDndOptions, HandlerTemplate, HandlerTemplateOptions, CommonUtils } from '../components/CommonUtils';
 import { RootState } from '../reducers';
-import { updateDragCategory } from '../actions';
+import { updateDragCategory, updateDropState } from '../actions';
 
 export type IDragOptions = Omit<BasicDndOptions, 'dropHandler'>;
 
@@ -53,6 +53,7 @@ export default function useDragClone(option: IDragOptions): any[] {
       if (currentItemCategory) {
         const categoryList = Object.values(currentItemCategory)[0];
         dispatch(updateDragCategory(categoryList[currentDragItemIdx]));
+        dispatch(updateDropState(false));
       }
     },
     [tempDragMap]

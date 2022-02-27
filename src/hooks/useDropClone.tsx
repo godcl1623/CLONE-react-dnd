@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { BasicDndOptions, HandlerTemplate, CommonUtils } from '../components/CommonUtils';
-import { setCurrentDropTarget, updateDropMap, __TESTAction__ } from '../actions';
+import { setCurrentDropTarget, updateDropCategory, updateDropMap, updateDropState } from '../actions';
 import { RootState } from '../reducers';
 
 export type IDropOptions = BasicDndOptions;
@@ -51,7 +51,9 @@ export default function useDropClone(option: IDropOptions): any {
         setDropLevel(levelOfDropTarget);
         const targetIdxInNodes = Array.from((htmlTarget.parentNode! as HTMLElement).childNodes).indexOf(htmlTarget);
         if (currentItemCategory) {
-          setDropCategory((Object.values(currentItemCategory)[levelOfDropTarget])[targetIdxInNodes]);
+          const dropCategory = (Object.values(currentItemCategory)[levelOfDropTarget])[targetIdxInNodes];
+          setDropCategory(dropCategory);
+          dispatch(updateDropCategory(dropCategory));
         }
       }
     },
@@ -64,6 +66,8 @@ export default function useDropClone(option: IDropOptions): any {
         dropHandler(e);
       }
     }
+    dispatch(setCurrentDropTarget(e.target! as HTMLElement));
+    dispatch(updateDropState(true));
   }, [currentDragCategory, currentDropCategory]);
 
   /* ############### drop 구조 정리 ############### */
