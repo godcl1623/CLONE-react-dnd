@@ -39,12 +39,12 @@ export default function App() {
       dispatch(setCurrentDragTarget(HTMLEventTarget));
     }
   }
-  const [ dropRef, dropLevel ] = useDropClone(dropOptions);
+  const [ dropRef, dropResult ] = useDropClone(dropOptions);
   const [ dragRef, bar ] = useDragClone(dragOptions);
 
   // useEffect(() => {
-  //   console.log(dropLevel)
-  // }, [dropLevel])
+  //   console.log(dropResult)
+  // }, [dropResult])
 
   const arr = [1, 2, 3, 4, 5];
   const children = arr.map(idx => 
@@ -88,8 +88,8 @@ export default function App() {
   }, [currentDropTarget, isDropped]);
 
   useEffect(() => {
-    console.log(localDrop)
-  }, [localDrop])
+    // if (dropResult) {}
+  }, [dropResult])
 
   return (
     <div id='App'>
@@ -116,23 +116,60 @@ export default function App() {
                   setLocalDrop(e.target)
                 }}
               >
-                { dragCategory === dropCategory && sec
+                {
+                  isDropped
                   ?
-                    dropLevel > 1 ? 'dropped' : ''
-                  : ''
+                    dropCategory === dragCategory
+                      ?
+                        dropResult.lastDroppedLevel === 2
+                          ?
+                            'dropped'
+                          :
+                            ''
+                      :
+                        ''
+                  :
+                    ''
                 }
               </div>
-              { dragCategory === dropCategory && fir
-                ?
-                  dropLevel > 0 && dropLevel === 1 ? 'dropped' : 'dropped on Child'
-                : ''
+              {
+                isDropped
+                  ?
+                    dropCategory === dragCategory
+                      ?
+                        dropResult.lastDroppedLevel === 1
+                          ?
+                            'dropped'
+                          :
+                            dropResult.lastDroppedLevel > 1 && dropResult.lastDroppedResult === 'child'
+                              ?
+                                'dropped on child'
+                              :
+                                ''
+                      :
+                        ''
+                  :
+                    ''
               }
             </div>
             {
-              dragCategory === dropCategory && cont
+              isDropped
                 ?
-                  dropLevel === 0 ? 'dropped' : 'dropped on child'
-                : ''
+                  dropCategory === dragCategory
+                  ?
+                    dropResult.lastDroppedResult === 'root'
+                      ?
+                        'dropped'
+                      :
+                        dropResult.lastDroppedResult === 'child'
+                          ?
+                            'dropped on child'
+                          :
+                            'logical error occured'
+                  :
+                    ''
+                :
+                  ''
             }
           </div>
           <div

@@ -5,6 +5,7 @@ import { setCurrentDropTarget, updateDropCategory, updateDropMap, updateDropStat
 import { RootState } from '../reducers';
 
 export type IDropOptions = BasicDndOptions;
+type DropResult = Record<string, string | number | null>;
 
 export default function useDropClone(option: IDropOptions): any {
   /* ############### state 정리 ############### */
@@ -12,6 +13,8 @@ export default function useDropClone(option: IDropOptions): any {
   const currentDragCategory = useSelector((state: RootState) => state.currentDragCategory);
   const [currentDropCategory, setDropCategory] = useState<string>('');
   const [currentDropLevel, setDropLevel] = useState<number>(-1);
+  const [lastDroppedLevel, setLastDroppedLevel] = useState<number>(-1);
+  const [lastDroppedResult, setLastDroppedResult] = useState<string | null>(null);
   const dropRef = useRef(null);
   const eventsList = ['drag', 'dragend', 'dragenter', 'dragexit', 'dragleave', 'dragover', 'dragstart'];
   const dispatch = useDispatch();
@@ -42,6 +45,11 @@ export default function useDropClone(option: IDropOptions): any {
     dropHandler,
   ];
 
+  const dropResult: DropResult = {
+    lastDroppedLevel,
+    lastDroppedResult
+  }
+
   const updateDropInfo = useCallback(
     (e: Event) => {
       if (dropMap) {
@@ -68,6 +76,13 @@ export default function useDropClone(option: IDropOptions): any {
     }
     dispatch(setCurrentDropTarget(e.target! as HTMLElement));
     dispatch(updateDropState(true));
+    if (dropMap) {
+      const htmlTarget = e.target! as HTMLElement;
+      const levelIncludesDropTarget = Object.values(dropMap).find(level => level.includes(htmlTarget))
+      const levelOfDropTarget = Object.values(dropMap).indexOf(levelIncludesDropTarget! as HTMLElement[]);
+      setLastDroppedLevel(levelOfDropTarget);
+      setLastDroppedResult(levelOfDropTarget === 0 ? 'root' : 'child');
+    }
   }, [currentDragCategory, currentDropCategory]);
 
   /* ############### drop 구조 정리 ############### */
@@ -102,5 +117,5 @@ export default function useDropClone(option: IDropOptions): any {
     return () => dropzoneRef.removeEventListener('drop', runDropHandler);
   }, [runDropHandler])
 
-  return [dropRef, currentDropLevel];
+  return [dropRef, dropResult];
 }
