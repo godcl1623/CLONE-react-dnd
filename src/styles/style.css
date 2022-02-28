@@ -12,6 +12,28 @@ html, body, #App, #dnd-test-zone {
 #dropzone {
   width: 500px;
   height: 500px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: white;
+}
+
+#dropzone_first_child {
+  width: 70%;
+  height: 70%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: white;
+}
+
+#dropzone_second_child {
+  width: 70%;
+  height: 70%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: white;
 }
 
 #item-container {
