@@ -12,9 +12,6 @@ export default function App() {
   const dropCategory = useSelector((state: RootState) => state.currentDropCategory);
   const isDropped = useSelector((state: RootState) => state.isDropped);
   const [localDrop, setLocalDrop] = useState<any>('');
-  const [cont, setCont] = useState<any>(false);
-  const [fir, setFir] = useState<any>(false);
-  const [sec, setSec] = useState<any>(false);
   const dispatch = useDispatch();
   const dropOptions: IDropOptions = {
     currentItemCategory: {
@@ -42,10 +39,6 @@ export default function App() {
   const [ dropRef, dropResult ] = useDropClone(dropOptions);
   const [ dragRef, bar ] = useDragClone(dragOptions);
 
-  // useEffect(() => {
-  //   console.log(dropResult)
-  // }, [dropResult])
-
   const arr = [1, 2, 3, 4, 5];
   const children = arr.map(idx => 
     <div
@@ -57,121 +50,21 @@ export default function App() {
     />
   );
 
-  useEffect(() => {
-    const container = dropRef.current;
-    const first = container.childNodes[0];
-    const second = first.childNodes[0];
-    if (isDropped) {
-      switch (currentDropTarget) {
-        case localDrop && container:
-          setCont(true);
-          setFir(false);
-          setSec(false);
-          break;
-        case localDrop && first:
-          setFir(true);
-          setCont(false);
-          setSec(false);
-          break;
-        case localDrop && second:
-          setSec(true);
-          setCont(false);
-          setFir(false);
-          break;
-        default:
-          setCont(false);
-          setFir(false);
-          setSec(false);
-          break;
-      }
-    }
-  }, [currentDropTarget, isDropped]);
-
-  useEffect(() => {
-    console.log(dropResult)
-  }, [dropResult])
-
   return (
     <div id='App'>
         <div id="dnd-test-zone">
           <div
             id="dropzone"
             ref={dropRef}
-            onDrop={e => {
-              e.stopPropagation();
-              setLocalDrop(e.target)
-            }}
           >
             <div
               id="dropzone_first_child"
-              onDrop={e => {
-                e.stopPropagation();
-                setLocalDrop(e.target)
-              }}
             >
               <div
                 id="dropzone_second_child"
-                onDrop={e => {
-                  e.stopPropagation();
-                  setLocalDrop(e.target)
-                }}
               >
-                {
-                  isDropped
-                  ?
-                    dropCategory === dragCategory
-                      ?
-                        dropResult.lastDroppedLevel === 2
-                          ?
-                            'dropped'
-                          :
-                            ''
-                      :
-                        ''
-                  :
-                    ''
-                }
               </div>
-              {
-                isDropped
-                  ?
-                    dropCategory === dragCategory
-                      ?
-                        dropResult.lastDroppedLevel === 1
-                          ?
-                            'dropped'
-                          :
-                            dropResult.lastDroppedLevel > 1 && dropResult.lastDroppedResult === 'child'
-                              ?
-                                'dropped on child'
-                              :
-                                ''
-                      :
-                        ''
-                  :
-                    ''
-              }
             </div>
-            {
-              isDropped
-                ?
-                  dropCategory === dragCategory
-                  ?
-                    dropResult.lastDroppedResult === 'root'
-                      ?
-                        'dropped'
-                      :
-                        dropResult.lastDroppedResult === 'child'
-                          ?
-                            'dropped on child'
-                          :
-                            'logical error occured'
-                        // ''
-                  :
-                    ''
-                :
-                  ''
-            }
           </div>
           <div
             id="item-container"

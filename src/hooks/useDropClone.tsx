@@ -5,8 +5,7 @@ import { setCurrentDropTarget, updateDropCategory, updateDropMap, updateDropStat
 import { RootState } from '../reducers';
 
 export type IDropOptions = BasicDndOptions;
-// type DropResult = Record<string, string | number | null>;
-type TESTDropResult = {
+type DropResult = {
   lastDroppedLevel: number;
   lastDroppedResult: string;
 }
@@ -16,9 +15,7 @@ export default function useDropClone(option: IDropOptions): any {
   const dropMap = useSelector((state: RootState) => state.dropMap);
   const currentDragCategory = useSelector((state: RootState) => state.currentDragCategory);
   const currentDropCategory = useSelector((state: RootState) => state.currentDropCategory);
-  // const [currentDropCategory, setDropCategory] = useState<string>('');
-  // const [currentDropLevel, setDropLevel] = useState<number>(-1);
-  const [lastdropResult, setDropResult] = useState<TESTDropResult>({
+  const [lastdropResult, setDropResult] = useState<DropResult>({
     lastDroppedLevel: -1,
     lastDroppedResult: ''
   });
@@ -53,8 +50,8 @@ export default function useDropClone(option: IDropOptions): any {
   ];
 
   const testUpdateDropResult = (
-    lastDroppedLevel: number = (lastdropResult! as TESTDropResult).lastDroppedLevel,
-    lastDroppedResult: string = (lastdropResult! as TESTDropResult).lastDroppedResult
+    lastDroppedLevel: number = (lastdropResult! as DropResult).lastDroppedLevel,
+    lastDroppedResult: string = (lastdropResult! as DropResult).lastDroppedResult
   ): void => {
     setDropResult({
       ...lastdropResult,
@@ -69,11 +66,9 @@ export default function useDropClone(option: IDropOptions): any {
         const htmlTarget = e.target! as HTMLElement;
         const levelIncludesDropTarget = Object.values(dropMap).find(level => level.includes(htmlTarget))
         const levelOfDropTarget = Object.values(dropMap).indexOf(levelIncludesDropTarget! as HTMLElement[]);
-        // setDropLevel(levelOfDropTarget);
         const targetIdxInNodes = Array.from((htmlTarget.parentNode! as HTMLElement).childNodes).indexOf(htmlTarget);
         if (currentItemCategory) {
           const dropCategory = (Object.values(currentItemCategory)[levelOfDropTarget])[targetIdxInNodes];
-          // setDropCategory(dropCategory);
           dispatch(updateDropCategory(dropCategory));
         }
       }
