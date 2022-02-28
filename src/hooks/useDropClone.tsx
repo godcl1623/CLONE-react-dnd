@@ -5,16 +5,23 @@ import { setCurrentDropTarget, updateDropCategory, updateDropMap, updateDropStat
 import { RootState } from '../reducers';
 
 export type IDropOptions = BasicDndOptions;
-type DropResult = Record<string, string | number | null>;
+// type DropResult = Record<string, string | number | null>;
+type TESTDropResult = {
+  lastDroppedLevel: number;
+  lastDroppedResult: string;
+}
 
 export default function useDropClone(option: IDropOptions): any {
   /* ############### state 정리 ############### */
   const dropMap = useSelector((state: RootState) => state.dropMap);
   const currentDragCategory = useSelector((state: RootState) => state.currentDragCategory);
-  const [currentDropCategory, setDropCategory] = useState<string>('');
-  const [currentDropLevel, setDropLevel] = useState<number>(-1);
-  const [lastDroppedLevel, setLastDroppedLevel] = useState<number>(-1);
-  const [lastDroppedResult, setLastDroppedResult] = useState<string | null>(null);
+  const currentDropCategory = useSelector((state: RootState) => state.currentDropCategory);
+  // const [currentDropCategory, setDropCategory] = useState<string>('');
+  // const [currentDropLevel, setDropLevel] = useState<number>(-1);
+  const [lastdropResult, setDropResult] = useState<TESTDropResult>({
+    lastDroppedLevel: -1,
+    lastDroppedResult: ''
+  });
   const dropRef = useRef(null);
   const eventsList = ['drag', 'dragend', 'dragenter', 'dragexit', 'dragleave', 'dragover', 'dragstart'];
   const dispatch = useDispatch();
@@ -45,22 +52,28 @@ export default function useDropClone(option: IDropOptions): any {
     dropHandler,
   ];
 
-  const dropResult: DropResult = {
-    lastDroppedLevel,
-    lastDroppedResult
+  const testUpdateDropResult = (
+    lastDroppedLevel: number = (lastdropResult! as TESTDropResult).lastDroppedLevel,
+    lastDroppedResult: string = (lastdropResult! as TESTDropResult).lastDroppedResult
+  ): void => {
+    setDropResult({
+      ...lastdropResult,
+      lastDroppedLevel,
+      lastDroppedResult
+    });
   }
 
-  const updateDropInfo = useCallback(
+  const initiateDropInfo = useCallback(
     (e: Event) => {
       if (dropMap) {
         const htmlTarget = e.target! as HTMLElement;
         const levelIncludesDropTarget = Object.values(dropMap).find(level => level.includes(htmlTarget))
         const levelOfDropTarget = Object.values(dropMap).indexOf(levelIncludesDropTarget! as HTMLElement[]);
-        setDropLevel(levelOfDropTarget);
+        // setDropLevel(levelOfDropTarget);
         const targetIdxInNodes = Array.from((htmlTarget.parentNode! as HTMLElement).childNodes).indexOf(htmlTarget);
         if (currentItemCategory) {
           const dropCategory = (Object.values(currentItemCategory)[levelOfDropTarget])[targetIdxInNodes];
-          setDropCategory(dropCategory);
+          // setDropCategory(dropCategory);
           dispatch(updateDropCategory(dropCategory));
         }
       }
@@ -80,8 +93,7 @@ export default function useDropClone(option: IDropOptions): any {
       const htmlTarget = e.target! as HTMLElement;
       const levelIncludesDropTarget = Object.values(dropMap).find(level => level.includes(htmlTarget))
       const levelOfDropTarget = Object.values(dropMap).indexOf(levelIncludesDropTarget! as HTMLElement[]);
-      setLastDroppedLevel(levelOfDropTarget);
-      setLastDroppedResult(levelOfDropTarget === 0 ? 'root' : 'child');
+      testUpdateDropResult(levelOfDropTarget, levelOfDropTarget === 0 ? 'root' : 'child');
     }
   }, [currentDragCategory, currentDropCategory]);
 
@@ -106,9 +118,9 @@ export default function useDropClone(option: IDropOptions): any {
   /* ############### drop 대상 정보(현재 계층, 드롭 대상 카테고리) 정리 ############### */
   useEffect(() => {
     const dropzoneRef = dropRef.current! as HTMLElement;
-    dropzoneRef.addEventListener('dragenter', updateDropInfo);
-    return () => dropzoneRef.removeEventListener('dragenter', updateDropInfo);
-  }, [updateDropInfo]);
+    dropzoneRef.addEventListener('dragenter', initiateDropInfo);
+    return () => dropzoneRef.removeEventListener('dragenter', initiateDropInfo);
+  }, [initiateDropInfo]);
 
   /* ############### drop 핸들러 적용 ############### */
   useEffect(() => {
@@ -117,5 +129,5 @@ export default function useDropClone(option: IDropOptions): any {
     return () => dropzoneRef.removeEventListener('drop', runDropHandler);
   }, [runDropHandler])
 
-  return [dropRef, dropResult];
+  return [dropRef, lastdropResult];
 }

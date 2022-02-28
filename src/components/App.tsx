@@ -88,7 +88,7 @@ export default function App() {
   }, [currentDropTarget, isDropped]);
 
   useEffect(() => {
-    // if (dropResult) {}
+    console.log(dropResult)
   }, [dropResult])
 
   return (
@@ -166,6 +166,7 @@ export default function App() {
                             'dropped on child'
                           :
                             'logical error occured'
+                        // ''
                   :
                     ''
                 :
