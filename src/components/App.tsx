@@ -29,8 +29,8 @@ export default function App() {
     currentItemCategory: {
       level0: ['test1', 'test2', 'test3']
     },
-    disableCurrent: true,
-    applyToChildren: true,
+    // disableCurrent: false,
+    // applyToChildren: false,
     dragstartHandler: (e: Event) => {
       const HTMLEventTarget = e.target! as HTMLElement;
       dispatch(setCurrentDragTarget(HTMLEventTarget));

@@ -9,7 +9,7 @@ export type IDragOptions = Omit<BasicDndOptions, 'dropHandler'>;
 export default function useDragClone(option: IDragOptions): any[] {
   const [isDraggable, makeDraggable] = useState(true);
   const [objTest, setObjTest] = useState<any>({});
-  const [tempDragMap, setDragMap] = useState<any>(null);
+  const [dragMap, setDragMap] = useState<any>(null);
   const dragRef = useRef(null);
   const eventsList = ['drag', 'dragend', 'dragenter', 'dragexit', 'dragleave', 'dragover', 'dragstart'];
   const dispatch = useDispatch();
@@ -45,7 +45,7 @@ export default function useDragClone(option: IDragOptions): any[] {
 
   const updateDragTargetInfo = useCallback(
     (e: Event) => {
-      const currentDragMap = disableCurrent ? Object.values(tempDragMap).slice(1) : Object.values(tempDragMap);
+      const currentDragMap = disableCurrent ? Object.values(dragMap).slice(1) : Object.values(dragMap);
       const dragMapIncludesTarget = currentDragMap.find(level =>
         (level! as HTMLElement[]).includes(e.target! as HTMLElement)
       );
@@ -56,7 +56,7 @@ export default function useDragClone(option: IDragOptions): any[] {
         dispatch(updateDropState(false));
       }
     },
-    [tempDragMap]
+    [dragMap]
   );
 
   /* ############### 드래그 구조 업데이트 ############### */
@@ -68,19 +68,44 @@ export default function useDragClone(option: IDragOptions): any[] {
 
   /* ############### 사용자 커스텀 핸들러 일괄 적용 ############### */
   useEffect(() => {
-    const dragItems = dragRef.current! as HTMLElement;
-    dragItems.childNodes.forEach(item => {
-      const htmlItem = item as HTMLElement;
-      htmlItem.draggable = isDraggable;
+    const dragItemsCnt = dragRef.current! as HTMLElement;
+    if ((disableCurrent == null || disableCurrent) && (applyToChildren == null || applyToChildren)) {
+      console.log('기본값');
+      dragItemsCnt.childNodes.forEach(item => {
+        const htmlItem = item as HTMLElement;
+        htmlItem.draggable = isDraggable;
+        eventsList.forEach((evt, idx) => {
+          htmlItem.addEventListener(
+            evt,
+            (e: Event) => new HandlerTemplate(e, handlerLists[idx]! as () => void, templateOptions)
+          );
+        });
+      });
+    } else if (!(disableCurrent == null || disableCurrent) && (applyToChildren == null || applyToChildren)) {
+      dragItemsCnt.draggable = isDraggable;
       eventsList.forEach((evt, idx) => {
-        htmlItem.addEventListener(
+        dragItemsCnt.addEventListener(
           evt,
           (e: Event) => new HandlerTemplate(e, handlerLists[idx]! as () => void, templateOptions)
         );
       });
-    });
+    } else if ((disableCurrent == null || disableCurrent) && !(applyToChildren == null || applyToChildren)) {
+      dragItemsCnt.draggable = isDraggable;
+      dragItemsCnt.childNodes.forEach(item => {
+        const htmlItem = item as HTMLElement;
+        htmlItem.draggable = !isDraggable;
+        eventsList.forEach((evt, idx) => {
+          htmlItem.addEventListener(evt, (e: Event) => {
+            e.preventDefault();
+            e.stopPropagation();
+          });
+        });
+      });
+    } else {
+      throw new Error('Invalid Option! Change the value of disableCurrent or applyToChildren!');
+    }
     return () => {
-      dragItems.childNodes.forEach(item => {
+      dragItemsCnt.childNodes.forEach(item => {
         const htmlItem = item as HTMLElement;
         eventsList.forEach((evt, idx) => {
           htmlItem.removeEventListener(
@@ -89,14 +114,37 @@ export default function useDragClone(option: IDragOptions): any[] {
           );
         });
       });
+      eventsList.forEach((evt, idx) => {
+        dragItemsCnt.removeEventListener(
+          evt,
+          (e: Event) => new HandlerTemplate(e, handlerLists[idx]! as () => void, templateOptions)
+        );
+      });
     };
   }, [isDraggable]);
 
   /* ############### 드래그 대상 정보 업데이트 ############### */
   useEffect(() => {
-    const dragItems = dragRef.current! as HTMLElement;
-    dragItems.childNodes.forEach(item => item.addEventListener('dragstart', updateDragTargetInfo));
-    return () => dragItems.childNodes.forEach(item => item.removeEventListener('dragstart', updateDragTargetInfo));
+    const dragItemsCnt = dragRef.current! as HTMLElement;
+    if ((disableCurrent == null || disableCurrent) && (applyToChildren == null || applyToChildren)) {
+      dragItemsCnt.childNodes.forEach(item => item.addEventListener('dragstart', updateDragTargetInfo));
+    } else if (!(disableCurrent == null || disableCurrent) && (applyToChildren == null || applyToChildren)) {
+      dragItemsCnt.addEventListener('dragstart', updateDragTargetInfo);
+    } else if ((disableCurrent == null || disableCurrent) && !(applyToChildren == null || applyToChildren)) {
+      dragItemsCnt.addEventListener('dragstart', updateDragTargetInfo);
+      dragItemsCnt.childNodes.forEach(item => {
+        item.addEventListener('dragstart', (e: Event) => {
+          e.preventDefault();
+          e.stopPropagation();
+        });
+      });
+    } else {
+      throw new Error('Invalid Option! Change the value of disableCurrent or applyToChildren!');
+    }
+    return () => {
+      dragItemsCnt.removeEventListener('dragstart', updateDragTargetInfo);
+      dragItemsCnt.childNodes.forEach(item => item.removeEventListener('dragstart', updateDragTargetInfo));
+    };
   }, [updateDragTargetInfo]);
 
   return [dragRef, objTest];

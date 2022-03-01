@@ -113,13 +113,41 @@ export default function useDropClone(option: IDropOptions): any {
   /* ############### 사용자 커스텀 핸들러 일괄 적용(drop 제외) ############### */
   useEffect(() => {
     const dropzoneRef = dropRef.current! as HTMLElement;
-    eventsList.forEach((evt, idx) => {
-      dropzoneRef.addEventListener(evt, (e: Event) => new HandlerTemplate(e, handlerLists[idx]! as () => void));
-    });
-    return () =>
+    if (disableCurrent && (applyToChildren == null || applyToChildren)) {
+      eventsList.forEach((evt, idx) => {
+        dropzoneRef.childNodes.forEach(child => {
+          child.addEventListener(evt, (e: Event) => new HandlerTemplate(e, handlerLists[idx]! as () => void));
+        });
+      });
+    } else if (!disableCurrent && (applyToChildren == null || applyToChildren)) {
+      eventsList.forEach((evt, idx) => {
+        dropzoneRef.addEventListener(evt, (e: Event) => new HandlerTemplate(e, handlerLists[idx]! as () => void));
+      });
+    } else if (!disableCurrent && !(applyToChildren == null || applyToChildren)) {
+      eventsList.forEach((evt, idx) => {
+        dropzoneRef.addEventListener(evt, (e: Event) => new HandlerTemplate(e, handlerLists[idx]! as () => void));
+      });
+      eventsList.forEach((evt, idx) => {
+        dropzoneRef.childNodes.forEach(child => {
+          child.addEventListener(evt, (e: Event) => {
+            e.preventDefault();
+            e.stopPropagation();
+          });
+        });
+      });
+    } else {
+      throw new Error('Invalid Option! Change the value of disableCurrent or applyToChildren!');
+    }
+    return () => {
       eventsList.forEach((evt, idx) => {
         dropzoneRef.removeEventListener(evt, (e: Event) => new HandlerTemplate(e, handlerLists[idx]! as () => void));
       });
+      eventsList.forEach((evt, idx) => {
+        dropzoneRef.childNodes.forEach(child => {
+          child.addEventListener(evt, (e: Event) => new HandlerTemplate(e, handlerLists[idx]! as () => void));
+        });
+      });
+    }
   }, []);
 
   /* ############### drop 대상 정보(현재 계층, 드롭 대상 카테고리) 정리 ############### */
@@ -139,6 +167,8 @@ export default function useDropClone(option: IDropOptions): any {
           e.stopPropagation();
         });
       });
+    } else {
+      throw new Error('Invalid Option! Change the value of disableCurrent or applyToChildren!');
     }
     return () => {
       dropzoneRef.removeEventListener('dragenter', initiateDropInfo);
@@ -163,6 +193,8 @@ export default function useDropClone(option: IDropOptions): any {
         e.preventDefault();
         e.stopPropagation();
       });
+    } else {
+      throw new Error('Invalid Option! Change the value of disableCurrent or applyToChildren!');
     }
     return () => {
       dropzoneRef.removeEventListener('drop', runDropHandler);
