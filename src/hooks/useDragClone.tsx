@@ -17,7 +17,7 @@ export default function useDragClone(option: IDragOptions): any[] {
 
   const {
     currentItemCategory,
-    disableParent,
+    disableCurrent,
     applyToChildren,
     dragHandler,
     dragendHandler,
@@ -45,7 +45,7 @@ export default function useDragClone(option: IDragOptions): any[] {
 
   const updateDragTargetInfo = useCallback(
     (e: Event) => {
-      const currentDragMap = disableParent ? Object.values(tempDragMap).slice(1) : Object.values(tempDragMap);
+      const currentDragMap = disableCurrent ? Object.values(tempDragMap).slice(1) : Object.values(tempDragMap);
       const dragMapIncludesTarget = currentDragMap.find(level =>
         (level! as HTMLElement[]).includes(e.target! as HTMLElement)
       );

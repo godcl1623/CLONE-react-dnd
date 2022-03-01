@@ -8,7 +8,8 @@ export type IDropOptions = BasicDndOptions;
 type DropResult = {
   lastDroppedLevel: number;
   lastDroppedResult: string;
-}
+  lastDroppedRect: DOMRect | null;
+};
 
 export default function useDropClone(option: IDropOptions): any {
   /* ############### state 정리 ############### */
@@ -17,7 +18,8 @@ export default function useDropClone(option: IDropOptions): any {
   const currentDropCategory = useSelector((state: RootState) => state.currentDropCategory);
   const [lastdropResult, setDropResult] = useState<DropResult>({
     lastDroppedLevel: -1,
-    lastDroppedResult: ''
+    lastDroppedResult: '',
+    lastDroppedRect: null,
   });
   const dropRef = useRef(null);
   const eventsList = ['drag', 'dragend', 'dragenter', 'dragexit', 'dragleave', 'dragover', 'dragstart'];
@@ -26,7 +28,7 @@ export default function useDropClone(option: IDropOptions): any {
 
   const {
     currentItemCategory,
-    disableParent,
+    disableCurrent,
     applyToChildren,
     dragHandler,
     dragendHandler,
@@ -49,26 +51,28 @@ export default function useDropClone(option: IDropOptions): any {
     dropHandler,
   ];
 
-  const testUpdateDropResult = (
+  const updateDropResult = (
     lastDroppedLevel: number = (lastdropResult! as DropResult).lastDroppedLevel,
-    lastDroppedResult: string = (lastdropResult! as DropResult).lastDroppedResult
+    lastDroppedResult: string = (lastdropResult! as DropResult).lastDroppedResult,
+    lastDroppedRect: DOMRect = (lastdropResult! as DropResult).lastDroppedRect! as DOMRect
   ): void => {
     setDropResult({
       ...lastdropResult,
       lastDroppedLevel,
-      lastDroppedResult
+      lastDroppedResult,
+      lastDroppedRect,
     });
-  }
+  };
 
   const initiateDropInfo = useCallback(
     (e: Event) => {
       if (dropMap) {
         const htmlTarget = e.target! as HTMLElement;
-        const levelIncludesDropTarget = Object.values(dropMap).find(level => level.includes(htmlTarget))
+        const levelIncludesDropTarget = Object.values(dropMap).find(level => level.includes(htmlTarget));
         const levelOfDropTarget = Object.values(dropMap).indexOf(levelIncludesDropTarget! as HTMLElement[]);
         const targetIdxInNodes = Array.from((htmlTarget.parentNode! as HTMLElement).childNodes).indexOf(htmlTarget);
         if (currentItemCategory) {
-          const dropCategory = (Object.values(currentItemCategory)[levelOfDropTarget])[targetIdxInNodes];
+          const dropCategory = Object.values(currentItemCategory)[levelOfDropTarget][targetIdxInNodes];
           dispatch(updateDropCategory(dropCategory));
         }
       }
@@ -76,21 +80,28 @@ export default function useDropClone(option: IDropOptions): any {
     [dropMap]
   );
 
-  const runDropHandler = useCallback((e: Event) => {
-    if (dropHandler) {
-      if (currentDragCategory === currentDropCategory) {
-        dropHandler(e);
+  const runDropHandler = useCallback(
+    (e: Event) => {
+      if (dropHandler) {
+        if (currentDragCategory === currentDropCategory) {
+          dropHandler(e);
+        }
       }
-    }
-    dispatch(setCurrentDropTarget(e.target! as HTMLElement));
-    dispatch(updateDropState(true));
-    if (dropMap) {
-      const htmlTarget = e.target! as HTMLElement;
-      const levelIncludesDropTarget = Object.values(dropMap).find(level => level.includes(htmlTarget))
-      const levelOfDropTarget = Object.values(dropMap).indexOf(levelIncludesDropTarget! as HTMLElement[]);
-      testUpdateDropResult(levelOfDropTarget, levelOfDropTarget === 0 ? 'root' : 'child');
-    }
-  }, [currentDragCategory, currentDropCategory]);
+      dispatch(setCurrentDropTarget(e.target! as HTMLElement));
+      dispatch(updateDropState(true));
+      if (dropMap) {
+        const htmlTarget = e.target! as HTMLElement;
+        const levelIncludesDropTarget = Object.values(dropMap).find(level => level.includes(htmlTarget));
+        const levelOfDropTarget = Object.values(dropMap).indexOf(levelIncludesDropTarget! as HTMLElement[]);
+        updateDropResult(
+          levelOfDropTarget,
+          levelOfDropTarget === 0 ? 'root' : 'child',
+          htmlTarget.getBoundingClientRect()
+        );
+      }
+    },
+    [currentDragCategory, currentDropCategory]
+  );
 
   /* ############### drop 구조 정리 ############### */
   useEffect(() => {
@@ -105,24 +116,61 @@ export default function useDropClone(option: IDropOptions): any {
     eventsList.forEach((evt, idx) => {
       dropzoneRef.addEventListener(evt, (e: Event) => new HandlerTemplate(e, handlerLists[idx]! as () => void));
     });
-    return () => eventsList.forEach((evt, idx) => {
-      dropzoneRef.removeEventListener(evt, (e: Event) => new HandlerTemplate(e, handlerLists[idx]! as () => void));
-    });
+    return () =>
+      eventsList.forEach((evt, idx) => {
+        dropzoneRef.removeEventListener(evt, (e: Event) => new HandlerTemplate(e, handlerLists[idx]! as () => void));
+      });
   }, []);
 
   /* ############### drop 대상 정보(현재 계층, 드롭 대상 카테고리) 정리 ############### */
   useEffect(() => {
     const dropzoneRef = dropRef.current! as HTMLElement;
-    dropzoneRef.addEventListener('dragenter', initiateDropInfo);
-    return () => dropzoneRef.removeEventListener('dragenter', initiateDropInfo);
+    if (disableCurrent && (applyToChildren == null || applyToChildren)) {
+      dropzoneRef.childNodes.forEach(child => {
+        child.addEventListener('dragenter', initiateDropInfo);
+      });
+    } else if (!disableCurrent && (applyToChildren == null || applyToChildren)) {
+      dropzoneRef.addEventListener('dragenter', initiateDropInfo);
+    } else if (!disableCurrent && !(applyToChildren == null || applyToChildren)) {
+      dropzoneRef.addEventListener('dragenter', initiateDropInfo);
+      dropzoneRef.childNodes.forEach(child => {
+        child.addEventListener('dragenter', (e: Event) => {
+          e.preventDefault();
+          e.stopPropagation();
+        });
+      });
+    }
+    return () => {
+      dropzoneRef.removeEventListener('dragenter', initiateDropInfo);
+      dropzoneRef.childNodes.forEach(child => {
+        child.removeEventListener('dragenter', initiateDropInfo);
+      });
+    };
   }, [initiateDropInfo]);
 
   /* ############### drop 핸들러 적용 ############### */
   useEffect(() => {
     const dropzoneRef = dropRef.current! as HTMLElement;
-    dropzoneRef.addEventListener('drop', runDropHandler);
-    return () => dropzoneRef.removeEventListener('drop', runDropHandler);
-  }, [runDropHandler])
+    if (disableCurrent && (applyToChildren == null || applyToChildren)) {
+      dropzoneRef.childNodes.forEach(child => {
+        child.addEventListener('drop', runDropHandler);
+      });
+    } else if (!disableCurrent && (applyToChildren == null || applyToChildren)) {
+      dropzoneRef.addEventListener('drop', runDropHandler);
+    } else if (!disableCurrent && !(applyToChildren == null || applyToChildren)) {
+      dropzoneRef.addEventListener('drop', runDropHandler);
+      dropzoneRef.childNodes.forEach(child => (e: Event) => {
+        e.preventDefault();
+        e.stopPropagation();
+      });
+    }
+    return () => {
+      dropzoneRef.removeEventListener('drop', runDropHandler);
+      dropzoneRef.childNodes.forEach(child => {
+        child.removeEventListener('drop', runDropHandler);
+      });
+    };
+  }, [runDropHandler]);
 
   return [dropRef, lastdropResult];
 }
