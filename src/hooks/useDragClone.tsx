@@ -5,16 +5,17 @@ import { RootState } from '../reducers';
 import { updateDragCategory, updateDropState } from '../actions';
 
 export type IDragOptions = Omit<BasicDndOptions, 'dropHandler'>;
-type DropResult = {
-  currentDragRect: DOMRect | null;
-  lastDroppedRect: DOMRect | null;
+type DragInfo = {
+  startPoint: DragEvent | null;
+  lastPoint: DragEvent | null;
 }
 
 export default function useDragClone(option: IDragOptions): any[] {
+  const isDropped = useSelector((state: RootState) => state.isDropped);
   const [isDraggable, makeDraggable] = useState(true);
-  const [dragInfo, setdragInfo] = useState<DropResult>({
-    currentDragRect: null,
-    lastDroppedRect: null
+  const [dragInfo, setdragInfo] = useState<DragInfo>({
+    startPoint: null,
+    lastPoint: null
   });
   const [dragMap, setDragMap] = useState<any>(null);
   const dragRef = useRef(null);
@@ -46,13 +47,13 @@ export default function useDragClone(option: IDragOptions): any[] {
   ];
 
   const updateDragInfo = (
-    currentDragRect: DOMRect = (dragInfo! as DropResult).currentDragRect! as DOMRect,
-    lastDroppedRect: DOMRect = (dragInfo! as DropResult).lastDroppedRect! as DOMRect
+    startPoint: DragEvent = (dragInfo! as DragInfo).startPoint! as DragEvent,
+    lastPoint: DragEvent = (dragInfo! as DragInfo).lastPoint! as DragEvent
     ): void => {
       setdragInfo({
         ...dragInfo,
-        currentDragRect,
-        lastDroppedRect
+        startPoint,
+        lastPoint
       })
   };
 
@@ -72,15 +73,19 @@ export default function useDragClone(option: IDragOptions): any[] {
         const categoryList = Object.values(currentItemCategory)[0];
         dispatch(updateDragCategory(categoryList[currentDragItemIdx]));
         dispatch(updateDropState(false));
-        updateDragInfo((e.target! as HTMLElement).getBoundingClientRect());
+        updateDragInfo(e! as DragEvent);
       }
     },
     [dragMap]
   );
 
   const updateDroppedTargetInfo = useCallback((e: Event) => {
-    updateDragInfo(dragInfo.currentDragRect! as DOMRect, (e.target! as HTMLElement).getBoundingClientRect());
-  }, [dragInfo.currentDragRect]);
+    if (isDropped) {
+      if (dragInfo.startPoint) {
+        updateDragInfo(dragInfo.startPoint! as DragEvent, e! as DragEvent);
+      }
+    }
+  }, [isDropped]);
 
   /* ############### 드래그 구조 업데이트 ############### */
   useEffect(() => {
@@ -175,16 +180,26 @@ export default function useDragClone(option: IDragOptions): any[] {
     const dragItemsCnt = dragRef.current! as HTMLElement;
     if ((disableCurrent == null || disableCurrent) && (applyToChildren == null || applyToChildren)) {
       // 기본값
-      dragItemsCnt.childNodes.forEach(item => item.addEventListener('drop', updateDroppedTargetInfo));
+      dragItemsCnt.childNodes.forEach(item => item.addEventListener('dragend', updateDroppedTargetInfo));
     } else if (!(disableCurrent == null || disableCurrent) && (applyToChildren == null || 
     applyToChildren)) {
       // 부모 + 자식
+      dragItemsCnt.addEventListener('dragend', updateDroppedTargetInfo);
     } else if ((disableCurrent == null || disableCurrent) && !(applyToChildren == null || 
     applyToChildren)) {
       // 부모만
+      dragItemsCnt.addEventListener('dragend', updateDroppedTargetInfo);
+      dragItemsCnt.childNodes.forEach(item => item.addEventListener('dragend', (e: Event) => {
+        e.preventDefault();
+        e.stopPropagation();
+      }));
     } else {
       throw new Error('Invalid Option! Change the value of disableCurrent or applyToChildren!');
     }
+    return () => {
+      dragItemsCnt.removeEventListener('dragend', updateDroppedTargetInfo);
+      dragItemsCnt.childNodes.forEach(item => item.removeEventListener('dragend', updateDroppedTargetInfo));
+    };
   }, [updateDroppedTargetInfo]);
 
   return [dragRef, dragInfo];

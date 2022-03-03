@@ -35,9 +35,9 @@ export default function App() {
   const [ dropRef, dropResult ] = useDropClone(dropOptions);
   const [ dragRef, dragInfo ] = useDragClone(dragOptions);
 
-  useEffect(() => {
-    console.log(dragInfo)
-  }, [dragInfo])
+  // useEffect(() => {
+  //   console.log(dragInfo)
+  // }, [dragInfo])
 
   const arr = [1, 2, 3, 4, 5];
   const children = arr.map(idx => 
