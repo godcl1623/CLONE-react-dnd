@@ -8,7 +8,6 @@ export type IDropOptions = BasicDndOptions;
 type DropResult = {
   lastDroppedLevel: number;
   lastDroppedResult: string;
-  lastDroppedRect: DOMRect | null;
 };
 
 export default function useDropClone(option: IDropOptions): any {
@@ -19,7 +18,6 @@ export default function useDropClone(option: IDropOptions): any {
   const [lastdropResult, setDropResult] = useState<DropResult>({
     lastDroppedLevel: -1,
     lastDroppedResult: '',
-    lastDroppedRect: null,
   });
   const dropRef = useRef(null);
   const eventsList = ['drag', 'dragend', 'dragenter', 'dragexit', 'dragleave', 'dragover', 'dragstart'];
@@ -54,13 +52,11 @@ export default function useDropClone(option: IDropOptions): any {
   const updateDropResult = (
     lastDroppedLevel: number = (lastdropResult! as DropResult).lastDroppedLevel,
     lastDroppedResult: string = (lastdropResult! as DropResult).lastDroppedResult,
-    lastDroppedRect: DOMRect = (lastdropResult! as DropResult).lastDroppedRect! as DOMRect
   ): void => {
     setDropResult({
       ...lastdropResult,
       lastDroppedLevel,
       lastDroppedResult,
-      lastDroppedRect,
     });
   };
 
@@ -95,8 +91,7 @@ export default function useDropClone(option: IDropOptions): any {
         const levelOfDropTarget = Object.values(dropMap).indexOf(levelIncludesDropTarget! as HTMLElement[]);
         updateDropResult(
           levelOfDropTarget,
-          levelOfDropTarget === 0 ? 'root' : 'child',
-          htmlTarget.getBoundingClientRect()
+          levelOfDropTarget === 0 ? 'root' : 'child'
         );
       }
     },
@@ -186,6 +181,7 @@ export default function useDropClone(option: IDropOptions): any {
         child.addEventListener('drop', runDropHandler);
       });
     } else if (!disableCurrent && (applyToChildren == null || applyToChildren)) {
+      // 기본값
       dropzoneRef.addEventListener('drop', runDropHandler);
     } else if (!disableCurrent && !(applyToChildren == null || applyToChildren)) {
       dropzoneRef.addEventListener('drop', runDropHandler);

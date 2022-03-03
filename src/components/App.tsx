@@ -19,8 +19,6 @@ export default function App() {
       level1: ['test2'],
       level2: ['test3']
     },
-    // disableCurrent: true,
-    // applyToChildren: false,
     dropHandler: (e: Event) => {
       alert(e.target);
     }
@@ -29,19 +27,17 @@ export default function App() {
     currentItemCategory: {
       level0: ['test1', 'test2', 'test3']
     },
-    // disableCurrent: false,
-    // applyToChildren: false,
     dragstartHandler: (e: Event) => {
       const HTMLEventTarget = e.target! as HTMLElement;
       dispatch(setCurrentDragTarget(HTMLEventTarget));
     }
   }
   const [ dropRef, dropResult ] = useDropClone(dropOptions);
-  const [ dragRef, bar ] = useDragClone(dragOptions);
+  const [ dragRef, dragInfo ] = useDragClone(dragOptions);
 
-  // useEffect(() => {
-  //   console.log(dropResult)
-  // }, [dropResult])
+  useEffect(() => {
+    console.log(dragInfo)
+  }, [dragInfo])
 
   const arr = [1, 2, 3, 4, 5];
   const children = arr.map(idx => 

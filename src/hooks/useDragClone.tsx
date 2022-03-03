@@ -5,10 +5,17 @@ import { RootState } from '../reducers';
 import { updateDragCategory, updateDropState } from '../actions';
 
 export type IDragOptions = Omit<BasicDndOptions, 'dropHandler'>;
+type DropResult = {
+  currentDragRect: DOMRect | null;
+  lastDroppedRect: DOMRect | null;
+}
 
 export default function useDragClone(option: IDragOptions): any[] {
   const [isDraggable, makeDraggable] = useState(true);
-  const [objTest, setObjTest] = useState<any>({});
+  const [dragInfo, setdragInfo] = useState<DropResult>({
+    currentDragRect: null,
+    lastDroppedRect: null
+  });
   const [dragMap, setDragMap] = useState<any>(null);
   const dragRef = useRef(null);
   const eventsList = ['drag', 'dragend', 'dragenter', 'dragexit', 'dragleave', 'dragover', 'dragstart'];
@@ -38,6 +45,17 @@ export default function useDragClone(option: IDragOptions): any[] {
     dragstartHandler,
   ];
 
+  const updateDragInfo = (
+    currentDragRect: DOMRect = (dragInfo! as DropResult).currentDragRect! as DOMRect,
+    lastDroppedRect: DOMRect = (dragInfo! as DropResult).lastDroppedRect! as DOMRect
+    ): void => {
+      setdragInfo({
+        ...dragInfo,
+        currentDragRect,
+        lastDroppedRect
+      })
+  };
+
   const templateOptions: HandlerTemplateOptions = {
     disablePreventDefault: true,
     disableStopPropagation: true,
@@ -54,10 +72,15 @@ export default function useDragClone(option: IDragOptions): any[] {
         const categoryList = Object.values(currentItemCategory)[0];
         dispatch(updateDragCategory(categoryList[currentDragItemIdx]));
         dispatch(updateDropState(false));
+        updateDragInfo((e.target! as HTMLElement).getBoundingClientRect());
       }
     },
     [dragMap]
   );
+
+  const updateDroppedTargetInfo = useCallback((e: Event) => {
+    updateDragInfo(dragInfo.currentDragRect! as DOMRect, (e.target! as HTMLElement).getBoundingClientRect());
+  }, [dragInfo.currentDragRect]);
 
   /* ############### 드래그 구조 업데이트 ############### */
   useEffect(() => {
@@ -70,7 +93,7 @@ export default function useDragClone(option: IDragOptions): any[] {
   useEffect(() => {
     const dragItemsCnt = dragRef.current! as HTMLElement;
     if ((disableCurrent == null || disableCurrent) && (applyToChildren == null || applyToChildren)) {
-      console.log('기본값');
+      // 기본값: 자식 요소만 적용
       dragItemsCnt.childNodes.forEach(item => {
         const htmlItem = item as HTMLElement;
         htmlItem.draggable = isDraggable;
@@ -147,5 +170,22 @@ export default function useDragClone(option: IDragOptions): any[] {
     };
   }, [updateDragTargetInfo]);
 
-  return [dragRef, objTest];
+  /* ############### 드롭 대상 정보 업데이트 ############### */
+  useEffect(() => {
+    const dragItemsCnt = dragRef.current! as HTMLElement;
+    if ((disableCurrent == null || disableCurrent) && (applyToChildren == null || applyToChildren)) {
+      // 기본값
+      dragItemsCnt.childNodes.forEach(item => item.addEventListener('drop', updateDroppedTargetInfo));
+    } else if (!(disableCurrent == null || disableCurrent) && (applyToChildren == null || 
+    applyToChildren)) {
+      // 부모 + 자식
+    } else if ((disableCurrent == null || disableCurrent) && !(applyToChildren == null || 
+    applyToChildren)) {
+      // 부모만
+    } else {
+      throw new Error('Invalid Option! Change the value of disableCurrent or applyToChildren!');
+    }
+  }, [updateDroppedTargetInfo]);
+
+  return [dragRef, dragInfo];
 }
