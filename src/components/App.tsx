@@ -21,7 +21,8 @@ export default function App() {
     },
     dropHandler: (e: Event) => {
       alert(e.target);
-    }
+    },
+    applyToChildren: false
   }
   const dragOptions: IDragOptions = {
     currentItemCategory: {
@@ -57,15 +58,14 @@ export default function App() {
             id="dropzone"
             ref={dropRef}
           >
-            <div
+            {/* <div
               id="dropzone_first_child"
             >
               <div
                 id="dropzone_second_child"
               >
               </div>
-            </div>
-          </div>
+            </div> */}
           <div
             id="item-container"
             ref={dragRef}
@@ -73,6 +73,7 @@ export default function App() {
             <div className="item">item 1</div>
             <div className="item">item 2</div>
             <div className="item">item 3</div>
+          </div>
           </div>
         </div>
     </div>

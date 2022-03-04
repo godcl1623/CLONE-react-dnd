@@ -8,14 +8,14 @@ export type IDragOptions = Omit<BasicDndOptions, 'dropHandler'>;
 type DragInfo = {
   startPoint: DragEvent | null;
   lastPoint: DragEvent | null;
-}
+};
 
 export default function useDragClone(option: IDragOptions): any[] {
   const isDropped = useSelector((state: RootState) => state.isDropped);
   const [isDraggable, makeDraggable] = useState(true);
   const [dragInfo, setdragInfo] = useState<DragInfo>({
     startPoint: null,
-    lastPoint: null
+    lastPoint: null,
   });
   const [dragMap, setDragMap] = useState<any>(null);
   const dragRef = useRef(null);
@@ -49,12 +49,12 @@ export default function useDragClone(option: IDragOptions): any[] {
   const updateDragInfo = (
     startPoint: DragEvent = (dragInfo! as DragInfo).startPoint! as DragEvent,
     lastPoint: DragEvent = (dragInfo! as DragInfo).lastPoint! as DragEvent
-    ): void => {
-      setdragInfo({
-        ...dragInfo,
-        startPoint,
-        lastPoint
-      })
+  ): void => {
+    setdragInfo({
+      ...dragInfo,
+      startPoint,
+      lastPoint,
+    });
   };
 
   const templateOptions: HandlerTemplateOptions = {
@@ -79,13 +79,16 @@ export default function useDragClone(option: IDragOptions): any[] {
     [dragMap]
   );
 
-  const updateDroppedTargetInfo = useCallback((e: Event) => {
-    if (isDropped) {
-      if (dragInfo.startPoint) {
-        updateDragInfo(dragInfo.startPoint! as DragEvent, e! as DragEvent);
+  const updateDroppedTargetInfo = useCallback(
+    (e: Event) => {
+      if (isDropped) {
+        if (dragInfo.startPoint) {
+          updateDragInfo(dragInfo.startPoint! as DragEvent, e! as DragEvent);
+        }
       }
-    }
-  }, [isDropped]);
+    },
+    [isDropped]
+  );
 
   /* ############### 드래그 구조 업데이트 ############### */
   useEffect(() => {
@@ -102,23 +105,47 @@ export default function useDragClone(option: IDragOptions): any[] {
       dragItemsCnt.childNodes.forEach(item => {
         const htmlItem = item as HTMLElement;
         htmlItem.draggable = isDraggable;
-        eventsList.forEach((evt, idx) => {
-          htmlItem.addEventListener(
-            evt,
-            (e: Event) => new HandlerTemplate(e, handlerLists[idx]! as () => void, templateOptions)
-          );
+        // eventsList.forEach((evt, idx) => {
+        //   htmlItem.addEventListener(
+        //     evt,
+        //     (e: Event) => new HandlerTemplate(e, handlerLists[idx]! as () => void, templateOptions)
+        //   );
+        // });
+        handlerLists.forEach((handler, idx) => {
+          if (handler) {
+            htmlItem.addEventListener(
+              eventsList[idx],
+              (e: Event) => new HandlerTemplate(e, handler! as () => void, templateOptions)
+            );
+          }
         });
       });
     } else if (!(disableCurrent == null || disableCurrent) && (applyToChildren == null || applyToChildren)) {
       dragItemsCnt.draggable = isDraggable;
-      eventsList.forEach((evt, idx) => {
-        dragItemsCnt.addEventListener(
-          evt,
-          (e: Event) => new HandlerTemplate(e, handlerLists[idx]! as () => void, templateOptions)
-        );
+      // eventsList.forEach((evt, idx) => {
+      //   dragItemsCnt.addEventListener(
+      //     evt,
+      //     (e: Event) => new HandlerTemplate(e, handlerLists[idx]! as () => void, templateOptions)
+      //   );
+      // });
+      handlerLists.forEach((handler, idx) => {
+        if (handler) {
+          dragItemsCnt.addEventListener(
+            eventsList[idx],
+            (e: Event) => new HandlerTemplate(e, handler! as () => void, templateOptions)
+          );
+        }
       });
     } else if ((disableCurrent == null || disableCurrent) && !(applyToChildren == null || applyToChildren)) {
       dragItemsCnt.draggable = isDraggable;
+      handlerLists.forEach((handler, idx) => {
+        if (handler) {
+          dragItemsCnt.addEventListener(
+            eventsList[idx],
+            (e: Event) => new HandlerTemplate(e, handler! as () => void, templateOptions)
+          );
+        }
+      });
       dragItemsCnt.childNodes.forEach(item => {
         const htmlItem = item as HTMLElement;
         htmlItem.draggable = !isDraggable;
@@ -155,6 +182,7 @@ export default function useDragClone(option: IDragOptions): any[] {
   useEffect(() => {
     const dragItemsCnt = dragRef.current! as HTMLElement;
     if ((disableCurrent == null || disableCurrent) && (applyToChildren == null || applyToChildren)) {
+      // 기본값: 자식 요소만 적용
       dragItemsCnt.childNodes.forEach(item => item.addEventListener('dragstart', updateDragTargetInfo));
     } else if (!(disableCurrent == null || disableCurrent) && (applyToChildren == null || applyToChildren)) {
       dragItemsCnt.addEventListener('dragstart', updateDragTargetInfo);
@@ -181,18 +209,18 @@ export default function useDragClone(option: IDragOptions): any[] {
     if ((disableCurrent == null || disableCurrent) && (applyToChildren == null || applyToChildren)) {
       // 기본값
       dragItemsCnt.childNodes.forEach(item => item.addEventListener('dragend', updateDroppedTargetInfo));
-    } else if (!(disableCurrent == null || disableCurrent) && (applyToChildren == null || 
-    applyToChildren)) {
+    } else if (!(disableCurrent == null || disableCurrent) && (applyToChildren == null || applyToChildren)) {
       // 부모 + 자식
       dragItemsCnt.addEventListener('dragend', updateDroppedTargetInfo);
-    } else if ((disableCurrent == null || disableCurrent) && !(applyToChildren == null || 
-    applyToChildren)) {
+    } else if ((disableCurrent == null || disableCurrent) && !(applyToChildren == null || applyToChildren)) {
       // 부모만
       dragItemsCnt.addEventListener('dragend', updateDroppedTargetInfo);
-      dragItemsCnt.childNodes.forEach(item => item.addEventListener('dragend', (e: Event) => {
-        e.preventDefault();
-        e.stopPropagation();
-      }));
+      dragItemsCnt.childNodes.forEach(item =>
+        item.addEventListener('dragend', (e: Event) => {
+          e.preventDefault();
+          e.stopPropagation();
+        })
+      );
     } else {
       throw new Error('Invalid Option! Change the value of disableCurrent or applyToChildren!');
     }
