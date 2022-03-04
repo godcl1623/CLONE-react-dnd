@@ -105,12 +105,6 @@ export default function useDragClone(option: IDragOptions): any[] {
       dragItemsCnt.childNodes.forEach(item => {
         const htmlItem = item as HTMLElement;
         htmlItem.draggable = isDraggable;
-        // eventsList.forEach((evt, idx) => {
-        //   htmlItem.addEventListener(
-        //     evt,
-        //     (e: Event) => new HandlerTemplate(e, handlerLists[idx]! as () => void, templateOptions)
-        //   );
-        // });
         handlerLists.forEach((handler, idx) => {
           if (handler) {
             htmlItem.addEventListener(
@@ -122,12 +116,6 @@ export default function useDragClone(option: IDragOptions): any[] {
       });
     } else if (!(disableCurrent == null || disableCurrent) && (applyToChildren == null || applyToChildren)) {
       dragItemsCnt.draggable = isDraggable;
-      // eventsList.forEach((evt, idx) => {
-      //   dragItemsCnt.addEventListener(
-      //     evt,
-      //     (e: Event) => new HandlerTemplate(e, handlerLists[idx]! as () => void, templateOptions)
-      //   );
-      // });
       handlerLists.forEach((handler, idx) => {
         if (handler) {
           dragItemsCnt.addEventListener(
@@ -162,18 +150,26 @@ export default function useDragClone(option: IDragOptions): any[] {
     return () => {
       dragItemsCnt.childNodes.forEach(item => {
         const htmlItem = item as HTMLElement;
-        eventsList.forEach((evt, idx) => {
-          htmlItem.removeEventListener(
-            evt,
-            (e: Event) => new HandlerTemplate(e, handlerLists[idx]! as () => void, templateOptions)
-          );
+        htmlItem.draggable = isDraggable;
+        handlerLists.forEach((handler, idx) => {
+          if (handler) {
+            htmlItem.removeEventListener(
+              eventsList[idx],
+              (e: Event) => {
+                new HandlerTemplate(e, handler! as () => void, templateOptions)
+                e.preventDefault();
+                e.stopPropagation();
+            });
+          }
         });
       });
-      eventsList.forEach((evt, idx) => {
-        dragItemsCnt.removeEventListener(
-          evt,
-          (e: Event) => new HandlerTemplate(e, handlerLists[idx]! as () => void, templateOptions)
-        );
+      handlerLists.forEach((handler, idx) => {
+        if (handler) {
+          dragItemsCnt.removeEventListener(
+            eventsList[idx],
+            (e: Event) => new HandlerTemplate(e, handler! as () => void, templateOptions)
+          );
+        }
       });
     };
   }, [isDraggable]);

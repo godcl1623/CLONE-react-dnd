@@ -46,7 +46,6 @@ export default function useDropClone(option: IDropOptions): any {
     dragleaveHandler,
     dragoverHandler,
     dragstartHandler,
-    // dropHandler,
   ];
 
   const updateDropResult = (
@@ -105,55 +104,15 @@ export default function useDropClone(option: IDropOptions): any {
   /* ############### 사용자 커스텀 핸들러 일괄 적용(drop 제외) ############### */
   useEffect(() => {
     const dropzoneRef = dropRef.current! as HTMLElement;
-    // if (disableCurrent && (applyToChildren == null || applyToChildren)) {
-    //   eventsList.forEach((evt, idx) => {
-    //     dropzoneRef.childNodes.forEach(child => {
-    //       child.addEventListener(evt, (e: Event) => new HandlerTemplate(e, handlerLists[idx]! as () => void));
-    //     });
-    //   });
-    // } else if (!disableCurrent && (applyToChildren == null || applyToChildren)) {
-    //   eventsList.forEach((evt, idx) => {
-    //     dropzoneRef.addEventListener(evt, (e: Event) => new HandlerTemplate(e, handlerLists[idx]! as () => void));
-    //   });
-
-    // } else if (!disableCurrent && !(applyToChildren == null || applyToChildren)) {
-    // eventsList.forEach((evt, idx) => {
-    //   dropzoneRef.addEventListener(evt, (e: Event) => new HandlerTemplate(e, handlerLists[idx]! as () => void));
-    // });
-    // eventsList.forEach((evt, idx) => {
-    //   dropzoneRef.childNodes.forEach(child => {
-    //     child.addEventListener(evt, (e: Event) => {
-    //       // e.preventDefault();
-    //       // e.stopPropagation();
-    //     });
-    //   });
-    // });
     handlerLists.forEach((handler, idx) => {
       if (handler) {
         dropzoneRef.addEventListener(eventsList[idx], (e: Event) => new HandlerTemplate(e, handler! as () => void));
-        // dropzoneRef.childNodes.forEach(child => {
-        //   child.addEventListener(eventsList[idx], (e: Event) => {
-        //     e.preventDefault();
-        //     e.stopPropagation();
-        //   })
-        // })
       }
       dropzoneRef.addEventListener('dragover', (e: Event) => {
         e.preventDefault();
       });
     });
-    // } else {
-    //   throw new Error('Invalid Option! Change the value of disableCurrent or applyToChildren!');
-    // }
     return () => {
-      // eventsList.forEach((evt, idx) => {
-      //   dropzoneRef.removeEventListener(evt, (e: Event) => new HandlerTemplate(e, handlerLists[idx]! as () => void));
-      // });
-      // eventsList.forEach((evt, idx) => {
-      //   dropzoneRef.childNodes.forEach(child => {
-      //     child.removeEventListener(evt, (e: Event) => new HandlerTemplate(e, handlerLists[idx]! as () => void));
-      //   });
-      // });
       handlerLists.forEach((handler, idx) => {
         if (handler) {
           dropzoneRef.removeEventListener(
@@ -171,28 +130,9 @@ export default function useDropClone(option: IDropOptions): any {
   /* ############### drop 대상 정보(현재 계층, 드롭 대상 카테고리) 정리 ############### */
   useEffect(() => {
     const dropzoneRef = dropRef.current! as HTMLElement;
-    // if (disableCurrent && (applyToChildren == null || applyToChildren)) {
-    //   dropzoneRef.childNodes.forEach(child => {
-    //     child.addEventListener('dragenter', initiateDropInfo);
-    //   });
-    // } else if (!disableCurrent && (applyToChildren == null || applyToChildren)) {
-      dropzoneRef.addEventListener('dragenter', initiateDropInfo);
-    // } else if (!disableCurrent && !(applyToChildren == null || applyToChildren)) {
-    //   dropzoneRef.addEventListener('dragenter', initiateDropInfo);
-    //   // dropzoneRef.childNodes.forEach(child => {
-    //   //   child.addEventListener('dragenter', (e: Event) => {
-    //   //     e.preventDefault();
-    //   //     e.stopPropagation();
-    //   //   });
-    //   // });
-    // } else {
-    //   throw new Error('Invalid Option! Change the value of disableCurrent or applyToChildren!');
-    // }
+    dropzoneRef.addEventListener('dragenter', initiateDropInfo);
     return () => {
       dropzoneRef.removeEventListener('dragenter', initiateDropInfo);
-      // dropzoneRef.childNodes.forEach(child => {
-      //   child.removeEventListener('dragenter', initiateDropInfo);
-      // });
     };
   }, [initiateDropInfo]);
 
