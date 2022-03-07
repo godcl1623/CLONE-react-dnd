@@ -7,8 +7,16 @@ import { updateDragCategory, updateDropState } from '../actions';
 // export type IDragOptions = Omit<BasicDndOptions, 'dropHandler'>;
 export type IDragOptions = BasicDndOptions;
 type DragInfo = {
-  startPoint: DragEvent | null;
-  lastPoint: DragEvent | null;
+  // startPoint: DragEvent | null;
+  // lastPoint: DragEvent | null;
+  startInfo: {
+    startEleInfo: DOMRect | null;
+    startCoords: DragEvent | null;
+  };
+  lastInfo: {
+    lastEleInfo: DOMRect | null;
+    lastCoords: DragEvent | null;
+  };
 };
 
 export default function useDragClone(option: IDragOptions): any[] {
@@ -17,8 +25,14 @@ export default function useDragClone(option: IDragOptions): any[] {
   const dropCategory = useSelector((state: RootState) => state.currentDropCategory);
   const [isDraggable, makeDraggable] = useState(true);
   const [dragInfo, setdragInfo] = useState<DragInfo>({
-    startPoint: null,
-    lastPoint: null,
+    startInfo: {
+      startEleInfo: null,
+      startCoords: null
+    },
+    lastInfo: {
+      lastEleInfo: null,
+      lastCoords: null
+    },
   });
   const [dragMap, setDragMap] = useState<any>(null);
   const dragRef = useRef(null);
@@ -50,13 +64,23 @@ export default function useDragClone(option: IDragOptions): any[] {
   ];
 
   const updateDragInfo = (
-    startPoint: DragEvent = (dragInfo! as DragInfo).startPoint! as DragEvent,
-    lastPoint: DragEvent = (dragInfo! as DragInfo).lastPoint! as DragEvent
+    startEleInfo: DOMRect = dragInfo.startInfo.startEleInfo! as DOMRect,
+    startCoords: DragEvent = dragInfo.startInfo.startCoords! as DragEvent,
+    lastEleInfo: DOMRect = dragInfo.lastInfo.lastEleInfo! as DOMRect,
+    lastCoords: DragEvent = dragInfo.lastInfo.lastCoords! as DragEvent
   ): void => {
     setdragInfo({
       ...dragInfo,
-      startPoint,
-      lastPoint,
+      startInfo: {
+        ...dragInfo.startInfo,
+        startEleInfo,
+        startCoords
+      },
+      lastInfo: {
+        ...dragInfo.lastInfo,
+        lastEleInfo,
+        lastCoords
+      }
     });
   };
 
@@ -76,7 +100,7 @@ export default function useDragClone(option: IDragOptions): any[] {
         const categoryList = Object.values(currentItemCategory)[0];
         dispatch(updateDragCategory(categoryList[currentDragItemIdx]));
         dispatch(updateDropState(false));
-        updateDragInfo(e! as DragEvent);
+        updateDragInfo((e.target! as HTMLElement).getBoundingClientRect(), e! as DragEvent);
       }
     },
     [dragMap]
@@ -85,8 +109,13 @@ export default function useDragClone(option: IDragOptions): any[] {
   const updateDroppedTargetInfo = useCallback(
     (e: Event) => {
       if (isDropped) {
-        if (dragInfo.startPoint) {
-          updateDragInfo(dragInfo.startPoint! as DragEvent, e! as DragEvent);
+        if (dragInfo.startInfo.startEleInfo) {
+          updateDragInfo(
+            dragInfo.startInfo.startEleInfo,
+            dragInfo.startInfo.startCoords! as DragEvent,
+            (e.target! as HTMLElement).getBoundingClientRect(),
+            e! as DragEvent
+          );
         }
       }
     },
