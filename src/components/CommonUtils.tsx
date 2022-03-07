@@ -8,7 +8,7 @@ type ItemCategory = Record<string, string[]>;
 export interface BasicDndOptions {
   // currentItemCategory?: (string | string[])[];
   currentItemCategory?: ItemCategory | (string | string[])[];
-  disableParent?: boolean;
+  disableCurrent?: boolean;
   applyToChildren?: boolean;
   dragHandler?: (e: Event) => void;
   dragendHandler?: (e: Event) => void;

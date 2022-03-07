@@ -8,7 +8,7 @@ export type IDropOptions = BasicDndOptions;
 type DropResult = {
   lastDroppedLevel: number;
   lastDroppedResult: string;
-}
+};
 
 export default function useDropClone(option: IDropOptions): any {
   /* ############### state 정리 ############### */
@@ -17,7 +17,7 @@ export default function useDropClone(option: IDropOptions): any {
   const currentDropCategory = useSelector((state: RootState) => state.currentDropCategory);
   const [lastdropResult, setDropResult] = useState<DropResult>({
     lastDroppedLevel: -1,
-    lastDroppedResult: ''
+    lastDroppedResult: '',
   });
   const dropRef = useRef(null);
   const eventsList = ['drag', 'dragend', 'dragenter', 'dragexit', 'dragleave', 'dragover', 'dragstart'];
@@ -26,7 +26,7 @@ export default function useDropClone(option: IDropOptions): any {
 
   const {
     currentItemCategory,
-    disableParent,
+    disableCurrent,
     applyToChildren,
     dragHandler,
     dragendHandler,
@@ -46,51 +46,55 @@ export default function useDropClone(option: IDropOptions): any {
     dragleaveHandler,
     dragoverHandler,
     dragstartHandler,
-    dropHandler,
   ];
 
-  const testUpdateDropResult = (
+  const updateDropResult = (
     lastDroppedLevel: number = (lastdropResult! as DropResult).lastDroppedLevel,
     lastDroppedResult: string = (lastdropResult! as DropResult).lastDroppedResult
   ): void => {
     setDropResult({
       ...lastdropResult,
       lastDroppedLevel,
-      lastDroppedResult
+      lastDroppedResult,
     });
-  }
+  };
 
   const initiateDropInfo = useCallback(
     (e: Event) => {
       if (dropMap) {
         const htmlTarget = e.target! as HTMLElement;
-        const levelIncludesDropTarget = Object.values(dropMap).find(level => level.includes(htmlTarget))
+        const levelIncludesDropTarget = Object.values(dropMap).find(level => level.includes(htmlTarget));
         const levelOfDropTarget = Object.values(dropMap).indexOf(levelIncludesDropTarget! as HTMLElement[]);
         const targetIdxInNodes = Array.from((htmlTarget.parentNode! as HTMLElement).childNodes).indexOf(htmlTarget);
         if (currentItemCategory) {
-          const dropCategory = (Object.values(currentItemCategory)[levelOfDropTarget])[targetIdxInNodes];
-          dispatch(updateDropCategory(dropCategory));
+          const dropCategory = Object.values(currentItemCategory)[levelOfDropTarget][targetIdxInNodes];
+          if (dropCategory) {
+            dispatch(updateDropCategory(dropCategory));
+          }
         }
       }
     },
     [dropMap]
   );
 
-  const runDropHandler = useCallback((e: Event) => {
-    if (dropHandler) {
-      if (currentDragCategory === currentDropCategory) {
-        dropHandler(e);
+  const runDropHandler = useCallback(
+    (e: Event) => {
+      if (dropHandler) {
+        if (currentDragCategory === currentDropCategory) {
+          dropHandler(e);
+        }
       }
-    }
-    dispatch(setCurrentDropTarget(e.target! as HTMLElement));
-    dispatch(updateDropState(true));
-    if (dropMap) {
-      const htmlTarget = e.target! as HTMLElement;
-      const levelIncludesDropTarget = Object.values(dropMap).find(level => level.includes(htmlTarget))
-      const levelOfDropTarget = Object.values(dropMap).indexOf(levelIncludesDropTarget! as HTMLElement[]);
-      testUpdateDropResult(levelOfDropTarget, levelOfDropTarget === 0 ? 'root' : 'child');
-    }
-  }, [currentDragCategory, currentDropCategory]);
+      dispatch(setCurrentDropTarget(e.target! as HTMLElement));
+      dispatch(updateDropState(true));
+      if (dropMap) {
+        const htmlTarget = e.target! as HTMLElement;
+        const levelIncludesDropTarget = Object.values(dropMap).find(level => level.includes(htmlTarget));
+        const levelOfDropTarget = Object.values(dropMap).indexOf(levelIncludesDropTarget! as HTMLElement[]);
+        updateDropResult(levelOfDropTarget, levelOfDropTarget === 0 ? 'root' : 'child');
+      }
+    },
+    [currentDragCategory, currentDropCategory]
+  );
 
   /* ############### drop 구조 정리 ############### */
   useEffect(() => {
@@ -102,27 +106,70 @@ export default function useDropClone(option: IDropOptions): any {
   /* ############### 사용자 커스텀 핸들러 일괄 적용(drop 제외) ############### */
   useEffect(() => {
     const dropzoneRef = dropRef.current! as HTMLElement;
-    eventsList.forEach((evt, idx) => {
-      dropzoneRef.addEventListener(evt, (e: Event) => new HandlerTemplate(e, handlerLists[idx]! as () => void));
+    handlerLists.forEach((handler, idx) => {
+      if (handler) {
+        dropzoneRef.addEventListener(eventsList[idx], (e: Event) => new HandlerTemplate(e, handler! as () => void));
+      }
+      dropzoneRef.addEventListener('dragover', (e: Event) => {
+        e.preventDefault();
+      });
     });
-    return () => eventsList.forEach((evt, idx) => {
-      dropzoneRef.removeEventListener(evt, (e: Event) => new HandlerTemplate(e, handlerLists[idx]! as () => void));
-    });
+    return () => {
+      handlerLists.forEach((handler, idx) => {
+        if (handler) {
+          dropzoneRef.removeEventListener(
+            eventsList[idx],
+            (e: Event) => new HandlerTemplate(e, handler! as () => void)
+          );
+        }
+        dropzoneRef.removeEventListener('dragover', (e: Event) => {
+          e.preventDefault();
+        });
+      });
+    };
   }, []);
 
   /* ############### drop 대상 정보(현재 계층, 드롭 대상 카테고리) 정리 ############### */
   useEffect(() => {
     const dropzoneRef = dropRef.current! as HTMLElement;
     dropzoneRef.addEventListener('dragenter', initiateDropInfo);
-    return () => dropzoneRef.removeEventListener('dragenter', initiateDropInfo);
+    return () => {
+      dropzoneRef.removeEventListener('dragenter', initiateDropInfo);
+    };
   }, [initiateDropInfo]);
 
   /* ############### drop 핸들러 적용 ############### */
   useEffect(() => {
     const dropzoneRef = dropRef.current! as HTMLElement;
-    dropzoneRef.addEventListener('drop', runDropHandler);
-    return () => dropzoneRef.removeEventListener('drop', runDropHandler);
-  }, [runDropHandler])
+    if (disableCurrent && (applyToChildren == null || applyToChildren)) {
+      dropzoneRef.childNodes.forEach(child => {
+        child.addEventListener('drop', runDropHandler);
+      });
+    } else if (!disableCurrent && (applyToChildren == null || applyToChildren)) {
+      // 기본값
+      dropzoneRef.addEventListener('drop', runDropHandler);
+    } else if (!disableCurrent && !(applyToChildren == null || applyToChildren)) {
+      dropzoneRef.addEventListener('drop', runDropHandler);
+      dropzoneRef.childNodes.forEach(child => {
+        child.addEventListener('drop', (e: Event) => {
+          e.preventDefault();
+          e.stopPropagation();
+        })
+      });
+    } else {
+      throw new Error('Invalid Option! Change the value of disableCurrent or applyToChildren!');
+    }
+    return () => {
+      dropzoneRef.removeEventListener('drop', runDropHandler);
+      dropzoneRef.childNodes.forEach(child => {
+        child.removeEventListener('drop', runDropHandler);
+        child.removeEventListener('drop', (e: Event) => {
+          e.preventDefault();
+          e.stopPropagation();
+        });
+      });
+    };
+  }, [runDropHandler]);
 
   return [dropRef, lastdropResult];
 }
