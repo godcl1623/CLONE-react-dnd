@@ -68,7 +68,9 @@ export default function useDropClone(option: IDropOptions): any {
         const targetIdxInNodes = Array.from((htmlTarget.parentNode! as HTMLElement).childNodes).indexOf(htmlTarget);
         if (currentItemCategory) {
           const dropCategory = Object.values(currentItemCategory)[levelOfDropTarget][targetIdxInNodes];
-          dispatch(updateDropCategory(dropCategory));
+          if (dropCategory) {
+            dispatch(updateDropCategory(dropCategory));
+          }
         }
       }
     },

@@ -4,7 +4,8 @@ import { BasicDndOptions, HandlerTemplate, HandlerTemplateOptions, CommonUtils }
 import { RootState } from '../reducers';
 import { updateDragCategory, updateDropState } from '../actions';
 
-export type IDragOptions = Omit<BasicDndOptions, 'dropHandler'>;
+// export type IDragOptions = Omit<BasicDndOptions, 'dropHandler'>;
+export type IDragOptions = BasicDndOptions;
 type DragInfo = {
   startPoint: DragEvent | null;
   lastPoint: DragEvent | null;
@@ -12,6 +13,8 @@ type DragInfo = {
 
 export default function useDragClone(option: IDragOptions): any[] {
   const isDropped = useSelector((state: RootState) => state.isDropped);
+  const dragCategory = useSelector((state: RootState) => state.currentDragCategory);
+  const dropCategory = useSelector((state: RootState) => state.currentDropCategory);
   const [isDraggable, makeDraggable] = useState(true);
   const [dragInfo, setdragInfo] = useState<DragInfo>({
     startPoint: null,
@@ -226,5 +229,5 @@ export default function useDragClone(option: IDragOptions): any[] {
     };
   }, [updateDroppedTargetInfo]);
 
-  return [dragRef, dragInfo];
+  return [dragRef, dragInfo, dropCategory];
 }
