@@ -15,6 +15,7 @@ export default function useDropClone(option: IDropOptions): any {
   const dropMap = useSelector((state: RootState) => state.dropMap);
   const currentDragCategory = useSelector((state: RootState) => state.currentDragCategory);
   const currentDropCategory = useSelector((state: RootState) => state.currentDropCategory);
+  const dropTarget = useSelector((state: RootState) => state.currentDropTarget);
   const [lastdropResult, setDropResult] = useState<DropResult>({
     lastDroppedLevel: -1,
     lastDroppedResult: '',
@@ -51,12 +52,14 @@ export default function useDropClone(option: IDropOptions): any {
         }
       }
     },
-    [dropMap]
+    []
   );
 
   const runDropHandler = useCallback(
     (e: Event) => {
-      dispatch(setCurrentDropTarget(e.target! as HTMLElement));
+      if (e.target !== dropTarget) {
+        dispatch(setCurrentDropTarget(e.target! as HTMLElement));
+      }
       dispatch(updateDropState(true));
       if (dropMap) {
         const htmlTarget = e.target! as HTMLElement;

@@ -7,7 +7,7 @@ export const __TESTAction__ = (any: any) => ({
   payload: any,
 });
 
-export const setCurrentDragTarget = (dragTarget: HTMLElement): ReturnAction<HTMLElement> => ({
+export const setCurrentDragTarget = (dragTarget: HTMLElement | null = null): ReturnAction<HTMLElement | null> => ({
   type: 'CURRENT_DRAG_IS',
   payload: dragTarget,
 });
