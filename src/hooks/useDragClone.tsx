@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { BasicDndOptions, HandlerTemplate, HandlerTemplateOptions, CommonUtils } from '../components/CommonUtils';
+// import { BasicDndOptions, HandlerTemplate, HandlerTemplateOptions, CommonUtils } from '../components/CommonUtils';
+import { BasicDndOptions, HandlerTemplateOptions, CommonUtils } from '../components/CommonUtils';
 import { RootState } from '../reducers';
 import { updateDragCategory, updateDropState } from '../actions';
 
@@ -36,7 +37,7 @@ export default function useDragClone(option: IDragOptions): any[] {
   });
   const [dragMap, setDragMap] = useState<any>(null);
   const dragRef = useRef(null);
-  const eventsList = ['drag', 'dragend', 'dragenter', 'dragexit', 'dragleave', 'dragover', 'dragstart'];
+  // const eventsList = ['drag', 'dragend', 'dragenter', 'dragexit', 'dragleave', 'dragover', 'dragstart'];
   const dispatch = useDispatch();
   const utils = new CommonUtils();
 
@@ -44,24 +45,24 @@ export default function useDragClone(option: IDragOptions): any[] {
     currentItemCategory,
     disableCurrent,
     applyToChildren,
-    dragHandler,
-    dragendHandler,
-    dragenterHandler,
-    dragexitHandler,
-    dragleaveHandler,
-    dragoverHandler,
-    dragstartHandler,
+    // dragHandler,
+    // dragendHandler,
+    // dragenterHandler,
+    // dragexitHandler,
+    // dragleaveHandler,
+    // dragoverHandler,
+    // dragstartHandler,
   } = option;
 
-  const handlerLists = [
-    dragHandler,
-    dragendHandler,
-    dragenterHandler,
-    dragexitHandler,
-    dragleaveHandler,
-    dragoverHandler,
-    dragstartHandler,
-  ];
+  // const handlerLists = [
+  //   dragHandler,
+  //   dragendHandler,
+  //   dragenterHandler,
+  //   dragexitHandler,
+  //   dragleaveHandler,
+  //   dragoverHandler,
+  //   dragstartHandler,
+  // ];
 
   const updateDragInfo = (
     startEleInfo: DOMRect = dragInfo.startInfo.startEleInfo! as DOMRect,
@@ -137,73 +138,73 @@ export default function useDragClone(option: IDragOptions): any[] {
       dragItemsCnt.childNodes.forEach(item => {
         const htmlItem = item as HTMLElement;
         htmlItem.draggable = isDraggable;
-        handlerLists.forEach((handler, idx) => {
-          if (handler) {
-            htmlItem.addEventListener(
-              eventsList[idx],
-              (e: Event) => new HandlerTemplate(e, handler! as () => void, templateOptions)
-            );
-          }
-        });
+        // handlerLists.forEach((handler, idx) => {
+        //   if (handler) {
+        //     htmlItem.addEventListener(
+        //       eventsList[idx],
+        //       (e: Event) => new HandlerTemplate(e, handler! as () => void, templateOptions)
+        //     );
+        //   }
+        // });
       });
     } else if (!(disableCurrent == null || disableCurrent) && (applyToChildren == null || applyToChildren)) {
       dragItemsCnt.draggable = isDraggable;
-      handlerLists.forEach((handler, idx) => {
-        if (handler) {
-          dragItemsCnt.addEventListener(
-            eventsList[idx],
-            (e: Event) => new HandlerTemplate(e, handler! as () => void, templateOptions)
-          );
-        }
-      });
+      // handlerLists.forEach((handler, idx) => {
+      //   if (handler) {
+      //     dragItemsCnt.addEventListener(
+      //       eventsList[idx],
+      //       (e: Event) => new HandlerTemplate(e, handler! as () => void, templateOptions)
+      //     );
+      //   }
+      // });
     } else if ((disableCurrent == null || disableCurrent) && !(applyToChildren == null || applyToChildren)) {
       dragItemsCnt.draggable = isDraggable;
-      handlerLists.forEach((handler, idx) => {
-        if (handler) {
-          dragItemsCnt.addEventListener(
-            eventsList[idx],
-            (e: Event) => new HandlerTemplate(e, handler! as () => void, templateOptions)
-          );
-        }
-      });
+      // handlerLists.forEach((handler, idx) => {
+      //   if (handler) {
+      //     dragItemsCnt.addEventListener(
+      //       eventsList[idx],
+      //       (e: Event) => new HandlerTemplate(e, handler! as () => void, templateOptions)
+      //     );
+      //   }
+      // });
       dragItemsCnt.childNodes.forEach(item => {
         const htmlItem = item as HTMLElement;
         htmlItem.draggable = !isDraggable;
-        eventsList.forEach((evt, idx) => {
-          htmlItem.addEventListener(evt, (e: Event) => {
-            e.preventDefault();
-            e.stopPropagation();
-          });
-        });
+        // eventsList.forEach((evt, idx) => {
+        //   htmlItem.addEventListener(evt, (e: Event) => {
+        //     e.preventDefault();
+        //     e.stopPropagation();
+        //   });
+        // });
       });
     } else {
       throw new Error('Invalid Option! Change the value of disableCurrent or applyToChildren!');
     }
-    return () => {
-      dragItemsCnt.childNodes.forEach(item => {
-        const htmlItem = item as HTMLElement;
-        htmlItem.draggable = isDraggable;
-        handlerLists.forEach((handler, idx) => {
-          if (handler) {
-            htmlItem.removeEventListener(
-              eventsList[idx],
-              (e: Event) => {
-                new HandlerTemplate(e, handler! as () => void, templateOptions)
-                e.preventDefault();
-                e.stopPropagation();
-            });
-          }
-        });
-      });
-      handlerLists.forEach((handler, idx) => {
-        if (handler) {
-          dragItemsCnt.removeEventListener(
-            eventsList[idx],
-            (e: Event) => new HandlerTemplate(e, handler! as () => void, templateOptions)
-          );
-        }
-      });
-    };
+    // return () => {
+    //   dragItemsCnt.childNodes.forEach(item => {
+    //     const htmlItem = item as HTMLElement;
+    //     htmlItem.draggable = isDraggable;
+    //     handlerLists.forEach((handler, idx) => {
+    //       if (handler) {
+    //         htmlItem.removeEventListener(
+    //           eventsList[idx],
+    //           (e: Event) => {
+    //             new HandlerTemplate(e, handler! as () => void, templateOptions)
+    //             e.preventDefault();
+    //             e.stopPropagation();
+    //         });
+    //       }
+    //     });
+    //   });
+    //   handlerLists.forEach((handler, idx) => {
+    //     if (handler) {
+    //       dragItemsCnt.removeEventListener(
+    //         eventsList[idx],
+    //         (e: Event) => new HandlerTemplate(e, handler! as () => void, templateOptions)
+    //       );
+    //     }
+    //   });
+    // };
   }, [isDraggable]);
 
   /* ############### 드래그 대상 정보 업데이트 ############### */

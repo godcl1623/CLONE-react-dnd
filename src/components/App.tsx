@@ -20,10 +20,10 @@ export default function App() {
       level1: ['test2', 'test3', 'test4', 'test5', 'test6', 'test7'],
       // level2: ['test3']
     },
-    dropHandler: (e: Event) => {
-      alert(e.target);
-    },
-    applyToChildren: false,
+    // dropHandler: (e: Event) => {
+    //   alert(e.target);
+    // },
+    // applyToChildren: false,
   };
   const dragOptions: IDragOptions = {
     currentItemCategory: {
@@ -86,6 +86,7 @@ export default function App() {
               dispatch(setCurrentDragTarget(HTMLEventTarget));
             }}
             onDragEnd={e => {
+              console.log(dropResult)
               const HTMLEventTarget = e.target! as HTMLElement;
               const parent = HTMLEventTarget.parentNode;
               const list = Array.from((parent! as HTMLElement).childNodes);
@@ -112,7 +113,8 @@ export default function App() {
                 parent?.removeChild(HTMLEventTarget);
                 parent?.insertBefore(HTMLEventTarget, list[insertCrit]);
               }
-            }}>
+            }}
+          >
             <div className="item">item 1</div>
             <div className="item">item 2</div>
             <div className="item">item 3</div>
