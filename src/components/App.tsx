@@ -19,27 +19,12 @@ export default function App() {
       level0: ['test1'],
       level1: ['test2', 'test3', 'test4', 'test5', 'test6', 'test7'],
       // level2: ['test3']
-    },
-    // dropHandler: (e: Event) => {
-    //   alert(e.target);
-    // },
-    // applyToChildren: false,
+    }
   };
   const dragOptions: IDragOptions = {
     currentItemCategory: {
       level0: ['test1', 'test2', 'test3', 'test4', 'test5', 'test6'],
-    },
-    // dragstartHandler: (e: Event) => {
-    //   const HTMLEventTarget = e.target! as HTMLElement;
-    //   dispatch(setCurrentDragTarget(HTMLEventTarget));
-    // },
-    // dragendHandler: (e: Event) => {
-    //   const HTMLEventTarget = e.target! as HTMLElement;
-    //   const parent = HTMLEventTarget.parentNode;
-    //   // parent?.removeChild(HTMLEventTarget);
-    //   // parent?.appendChild(HTMLEventTarget);
-    // }
-    // disableCurrent: false
+    }
   };
   const [dropRef, dropResult] = useDropClone(dropOptions);
   const [dragRef, dragInfo] = useDragClone(dragOptions);
