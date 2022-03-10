@@ -43,6 +43,24 @@
       "ignoreComments": true,
       "ignoreStrings": true,
       "ignoreTemplateLiterals": true
-    }] // prettier의 printWidth 옵션 대신 사용
+    }], // prettier의 printWidth 옵션 대신 사용
+    "default-param-last": 0,
+    "import/extensions": [
+      "error",
+      "ignorePackages",
+      {
+        "js": "never",
+        "jsx": "never",
+        "ts": "never",
+        "tsx": "never"
+      }
+    ]
+  },
+  "settings": {
+    "import/resolver": {
+      "node": {
+        "extensions": [".js", ".jsx", ".ts", ".tsx"]
+      }
+    }
   }
 }
