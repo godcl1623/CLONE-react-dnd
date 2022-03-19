@@ -20,6 +20,7 @@ export default function useDragClone(option: IDragOptions): any[] {
   const isDropped = useSelector((state: RootState) => state.isDropped);
   const currentDragCategory = useSelector((state: RootState) => state.currentDragCategory);
   const [isDraggable, makeDraggable] = useState(true);
+  const [refresher, setRefresher] = useState();
   const [dragInfo, setdragInfo] = useState<DragInfo>({
     startInfo: {
       startEleInfo: null,
@@ -128,7 +129,7 @@ export default function useDragClone(option: IDragOptions): any[] {
     } else {
       throw new Error('Invalid Option! Change the value of disableCurrent or applyToChildren!');
     }
-  }, [isDraggable]);
+  }, [isDraggable, refresher]);
 
   /* ############### 드래그 대상 정보 업데이트 ############### */
   useEffect(() => {
