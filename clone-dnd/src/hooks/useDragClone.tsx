@@ -1,8 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { BasicDndOptions, CommonUtils } from '../components/CommonUtils';
-import { RootState } from '../reducers';
-import { setCurrentDragTarget, updateDragCategory, updateDropState } from '../actions';
+import { BasicDndOptions, CommonUtils, useStore } from '../components/CommonUtils';
 
 export type IDragOptions = BasicDndOptions;
 type DragInfo = {
@@ -17,9 +14,9 @@ type DragInfo = {
 };
 
 export default function useDragClone(option: IDragOptions): any[] {
-  const isDropped = useSelector((state: RootState) => state.isDropped);
-  const currentDragCategory = useSelector((state: RootState) => state.currentDragCategory);
+  const { isDropped, currentDragCategory, setDragTgt, setDragCat, setDropState } = useStore();
   const [isDraggable, makeDraggable] = useState(true);
+  const [refresher, setRefresher] = useState();
   const [dragInfo, setdragInfo] = useState<DragInfo>({
     startInfo: {
       startEleInfo: null,
@@ -32,10 +29,9 @@ export default function useDragClone(option: IDragOptions): any[] {
   });
   const [dragMap, setDragMap] = useState<any>(null);
   const dragRef = useRef(null);
-  const dispatch = useDispatch();
   const utils = new CommonUtils();
 
-  const updateGlobalDragTarget = (dragTarget: HTMLElement) => dispatch(setCurrentDragTarget(dragTarget));
+  const updateGlobalDragTarget = (dragTarget: HTMLElement) => setDragTgt(dragTarget);
 
   const {
     currentItemCategory,
@@ -74,10 +70,10 @@ export default function useDragClone(option: IDragOptions): any[] {
       if (currentItemCategory) {
         const categoryList = Object.values(currentItemCategory)[0];
         if (currentDragCategory !== categoryList[currentDragItemIdx]) {
-          dispatch(updateDragCategory(categoryList[currentDragItemIdx]));
+          setDragCat(categoryList[currentDragItemIdx]);
         }
         if (isDropped) {
-          dispatch(updateDropState(false));
+          (setDropState(false));
         }
         updateDragInfo((e.target! as HTMLElement).getBoundingClientRect(), e! as DragEvent);
       }
@@ -128,7 +124,7 @@ export default function useDragClone(option: IDragOptions): any[] {
     } else {
       throw new Error('Invalid Option! Change the value of disableCurrent or applyToChildren!');
     }
-  }, [isDraggable]);
+  }, [isDraggable, refresher]);
 
   /* ############### 드래그 대상 정보 업데이트 ############### */
   useEffect(() => {

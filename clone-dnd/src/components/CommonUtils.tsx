@@ -1,3 +1,5 @@
+import create, { State } from 'zustand';
+
 /* eslint-disable class-methods-use-this */
 export interface BasicActionCreator<T> {
   type: string;
@@ -33,3 +35,30 @@ export class CommonUtils {
     return structure;
   }
 }
+
+export const useStore = create((set: ((state: State) => void)) => ({
+  currentDragTarget: null,
+  setDragTgt(dragTarget: HTMLElement | null): void {
+    set({ currentDragTarget: dragTarget });
+  },
+  currentDragCategory: '',
+  setDragCat(category: string): void {
+    set({ currentDragCategory: category });
+  },
+  currentDropCategory: '',
+  setDropCat(category: string): void {
+    set({ currentDropCategory: category });
+  },
+  currentDropTarget: null,
+  setDropTgt(dropTarget: HTMLElement | null): void {
+    set({ currentDropTarget: dropTarget });
+  },
+  dropMap: null,
+  setDropMap(dropMap: Structure): void {
+    set({ dropMap });
+  },
+  isDropped: false,
+  setDropState(dropState: boolean): void {
+    set({ isDropped: dropState });
+  }
+}))
