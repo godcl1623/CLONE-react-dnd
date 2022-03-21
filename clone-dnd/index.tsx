@@ -1,6 +1,6 @@
-import useDropClone from './hooks/useDropClone';
-import useDragClone from './hooks/useDragClone';
-import useGlobalStates from './hooks/useGlobalStates';
+import useDropClone from './src/hooks/useDropClone';
+import useDragClone from './src/hooks/useDropClone';
+import useGlobalStates from './src/hooks/useDropClone';
 
 const cloneDnd = {
   useDropClone,
