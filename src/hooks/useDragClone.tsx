@@ -180,5 +180,5 @@ export default function useDragClone(option: IDragOptions): any[] {
     };
   }, [updateDroppedTargetInfo]);
 
-  return [dragRef, updateGlobalDragTarget, dragInfo];
+  return [dragRef, updateGlobalDragTarget, dragInfo, setRefresher];
 }
