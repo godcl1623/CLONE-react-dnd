@@ -70,10 +70,14 @@ export default function useDragClone(option: IDragOptions): any[] {
       if (currentItemCategory) {
         const categoryList = Object.values(currentItemCategory)[0];
         if (currentDragCategory !== categoryList[currentDragItemIdx]) {
-          setDragCat(categoryList[currentDragItemIdx]);
+          if (categoryList.length !== 1) {
+            setDragCat(categoryList[currentDragItemIdx]);
+          } else {
+            setDragCat(categoryList[0]);
+          }
         }
         if (isDropped) {
-          (setDropState(false));
+          setDropState(false);
         }
         updateDragInfo((e.target! as HTMLElement).getBoundingClientRect(), e! as DragEvent);
       }
