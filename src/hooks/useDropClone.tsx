@@ -40,31 +40,25 @@ export default function useDropClone(option: IDropOptions): any {
     });
   };
 
-  const initiateDropInfo = useCallback(
-    (e: Event) => {
-      if (dropMap) {
-        const htmlTarget = e.target! as HTMLElement;
-        const levelIncludesDropTarget = Object.values(dropMap).find((level: any) => level.includes(htmlTarget));
-        const levelOfDropTarget = Object.values(dropMap).indexOf(levelIncludesDropTarget! as HTMLElement[]);
-        const targetIdxInNodes =
-          (currentItemCategory as (string | string[])[]).length > 1
-            ? Array.from((htmlTarget.parentNode! as HTMLElement).childNodes).indexOf(htmlTarget)
-            : 0;
-        if (currentItemCategory) {
-          let dropCategory = '';
-          if (applyToChildren) {
-            dropCategory = Object.values(currentItemCategory)[levelOfDropTarget][targetIdxInNodes];
-          } else {
-            dropCategory = Object.values(currentItemCategory)[0][targetIdxInNodes];
-          }
-          if (dropCategory) {
-            setDropCat(dropCategory);
-          }
+  const initiateDropInfo = useCallback((e: Event) => {
+    if (dropMap) {
+      const htmlTarget = e.target! as HTMLElement;
+      const levelIncludesDropTarget = Object.values(dropMap).find((level: any) => level.includes(htmlTarget));
+      const levelOfDropTarget = Object.values(dropMap).indexOf(levelIncludesDropTarget! as HTMLElement[]);
+      const targetIdxInNodes = (currentItemCategory as (string | string[])[]).length > 1 ? Array.from((htmlTarget.parentNode! as HTMLElement).childNodes).indexOf(htmlTarget) : 0;
+      if (currentItemCategory) {
+        let dropCategory = '';
+        if (applyToChildren) {
+          dropCategory = Object.values(currentItemCategory)[levelOfDropTarget][targetIdxInNodes];
+        } else {
+          dropCategory = Object.values(currentItemCategory)[0][targetIdxInNodes];
+        }
+        if (dropCategory) {
+          setDropCat(dropCategory);
         }
       }
-    },
-    [dropMap]
-  );
+    }
+  }, [dropMap]);
 
   const runDropHandler = useCallback(
     (e: Event) => {
