@@ -161,7 +161,7 @@ export default function useDragClone(option: IDragOptions): any[] {
   useEffect(() => {
     const dragItemsCnt = dragRef.current! as HTMLElement;
     if ((disableCurrent == null || disableCurrent) && (applyToChildren == null || applyToChildren)) {
-      // 기본값
+      // 기본값: 자식 요소만 적용
       dragItemsCnt.childNodes.forEach(item => item.addEventListener('dragend', updateDroppedTargetInfo));
     } else if (!(disableCurrent == null || disableCurrent) && (applyToChildren == null || applyToChildren)) {
       // 컨테이너, 자식 요소 모두 적용
@@ -184,5 +184,5 @@ export default function useDragClone(option: IDragOptions): any[] {
     };
   }, [updateDroppedTargetInfo]);
 
-  return [dragRef, updateGlobalDragTarget, dragInfo, setRefresher];
+  return [dragRef, updateGlobalDragTarget, dragInfo, setRefresher, makeDraggable];
 }
