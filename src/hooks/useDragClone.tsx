@@ -101,6 +101,12 @@ export default function useDragClone(option: IDragOptions): any[] {
     [isDropped]
   );
 
+  const setSettings: any = {
+    updateGlobalDragTarget,
+    setRefresher,
+    makeDraggable
+  }
+
   /* ############### 드래그 구조 업데이트 ############### */
   useEffect(() => {
     if (dragRef.current) {
@@ -184,5 +190,5 @@ export default function useDragClone(option: IDragOptions): any[] {
     };
   }, [updateDroppedTargetInfo]);
 
-  return [dragRef, updateGlobalDragTarget, dragInfo, setRefresher, makeDraggable];
+  return [dragRef, dragInfo, setSettings];
 }
