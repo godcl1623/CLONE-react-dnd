@@ -18,7 +18,8 @@ export default function App() {
     }
   };
   const [dropRef, dropResult] = useDropClone(dropOptions);
-  const [dragRef, updateGlobalDragTarget, dragInfo] = useDragClone(dragOptions);
+  const [dragRef, dragInfo, setSettings] = useDragClone(dragOptions);
+  const { updateGlobalDragTarget } = setSettings;
 
   return (
     <div id="App">
