@@ -1,7 +1,7 @@
 # clone-react-dnd
 
-애플리케이션 소개
-*clone-react-dnd*는 [React DnD](https://react-dnd.github.io/react-dnd/about) 라이브러리를 참고하여 만든 드래그 앤 드롭 라이브러리입니다.
+## 애플리케이션 소개
+**clone-react-dnd**는 [React DnD](https://react-dnd.github.io/react-dnd/about) 라이브러리를 참고하여 만든 드래그 앤 드롭 라이브러리입니다.
 
 연산 수행 및 상태 관리 수행을 통해 사용자의 드래그 앤 드롭 기능 구현을 보조하는 것을 목적으로 하고 있습니다.
 
@@ -15,10 +15,10 @@
 * [libmanage-client](https://github.com/godcl1623/libmanage-client) 프로젝트를 진행하던 중 드래그 앤 드롭을 사용한 정렬 기능을 추가하고자 했습니다.
 	* HTML 드래그 앤 드롭 API 자체는 다뤄본 경험이 있었기에, 이미 존재하는 라이브러리([React DnD](https://react-dnd.github.io/react-dnd/about))를 그대로 사용하기보다 직접 구현하는 것을 목표로 삼았습니다.
 
-* 참조한 라이브러리인 [React DnD](https://react-dnd.github.io/react-dnd/about)는 React.js의 Custom Hook 형태로 개발됐는데, 이제까지 개발을 진행하며 Custom Hook을 다뤄본 적이 없었습니다.
+* 참조한 라이브러리인 react-dnd는 React.js의 Custom Hook 형태로 개발됐는데, 이제까지 개발을 진행하며 Custom Hook을 다뤄본 적이 없었습니다.
 	* 이번 프로젝트를 통해 Custom Hook을 직접 구현해 봄으로써 React.js에 대한 이해도를 높이고자 했습니다.
 
-* 참조한 라이브러리인 [React DnD](https://react-dnd.github.io/react-dnd/about)를 참조하여 패키지 매니저를 통해 설치 및 사용하는 것을 상정하고 개발을 진행했습니다.
+* 참조한 라이브러리인 react-dnd를 참조하여 패키지 매니저를 통해 설치 및 사용하는 것을 상정하고 개발을 진행했습니다.
 	* 패키지 매니저를 통한 실제 배포는 진행하지 않았습니다.
 
 ## 프로젝트 구조
@@ -40,7 +40,7 @@
 <div markdown="1">
 
 * `useDragClone`은 react-dnd의 `useDrag` Hook에 해당합니다.
-  * `ref`를 지정한 대상, 자식 요소에 `draggable` 속성을 부여함으로써 드래그 가능하도록 만들어줍니다.
+  * `ref`를 지정한 대상, 자식 요소에 `draggable` 속성을 부여함으로써 드래그할 수 있도록 만들어줍니다.
 
 * **상세 기능**
   * 대상에 토글 가능한 드래그 속성 부여
@@ -89,15 +89,15 @@
 
   * **반환 배열**
     * **[0]**(`dragRef`)**(필수)**: 대상에 드래그 속성을 부여합니다.
-    * **[1]**(`dragInfo`): 드래그 앤 드롭 구현에 사용할 수 있는 데이터를 담은 객체입니다. 시작 지점 정보를 담은 `startInfo` 객체, 드롭 지점 정보를 담은 `lastInfo` 객체를 포함합니다.
+    * **[1]**(`dragInfo`): 드래그 앤 드롭 구현에 사용할 수 있는 데이터를 담은 객체입니다. 시작 시점 정보를 담은 `startInfo` 객체, 드롭 시점 정보를 담은 `lastInfo` 객체를 포함합니다.
       * `*Info` 객체는 각각 `*EleInfo`, `*Coords` 객체를 포함합니다.
       * `*EleInfo`는 `getBoundingClientRect()`로 반환된 정보를 담고 있습니다.
       * `*Coords`는 `DragEvent`로 반환된 정보를 담고 있습니다.
     * **[2]**(`setSettings`): 드래그 앤 드롭 구현에 사용할 수 있는 메서드를 포함하는 객체입니다.
-      * `updateGlobalDragTarget()`**(필수)**: `dragInfo` 계산을 위해 현재 드래그중인 대상을 지정하는 메서드입니다.
-        * `onDragStart` 이벤트의 이벤트 대상을 파라미터로 합니다.
+      * `updateGlobalDragTarget()`**(필수)**: `dragInfo` 계산을 위해 현재 드래그 중인 대상을 지정하는 메서드입니다.
+        * `onDragStart` 이벤트의 `event.target`을 파라미터로 합니다.
       * `setRefresher()`: DOM 노드가 새로 생성되어 재렌더링이 발생했을 때, 새로 생성된 노드에도 드래그 속성을 부여하기 위해 사용하는 메서드입니다.
-        * `onChange` 이벤트의 이벤트 대상을 파라미터로 합니다.
+        * `onChange` 이벤트의 `event.target`을 파라미터로 합니다.
       * `makeDraggable(param: boolean)`: 드래그 속성이 토글 형식으로 부여되도록 설정하는 메서드입니다.
         * 드래그 속성이 필요 없는경우 `false`를, 드래그 속성이 필요한 경우 `true`를 값으로 받습니다.
 
@@ -112,7 +112,7 @@
 <div markdown="1">
 
 * `useDropClone`은 react-dnd의 `useDrop` Hook에 해당합니다.
-  * `ref`를 지정한 대상, 자식 요소에 카테고리를 부여함으로써 드래그 대상과의 상호작용이 가능하도록 합니다.
+  * `ref`를 지정한 대상, 자식 요소에 카테고리를 부여함으로써 드래그 대상과의 상호작용이 가능해지도록 합니다.
 
 * **상세 기능**
   * 대상에 드롭 이벤트 부여
