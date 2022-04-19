@@ -21,10 +21,15 @@ export class CommonUtils {
     const structure: Structure = {};
     const q: HTMLElement[] = [node];
     let innerLvl: number = lvl;
+    // let nextLvlChildren: number = 0;
     structure[`level_${innerLvl}`] = [node];
     while (q.length !== 0) {
       const v: HTMLElement = q.shift()! as HTMLElement;
       const list: HTMLElement[] = Array.from(v.children)! as HTMLElement[];
+      // nextLvlChildren += list.length;
+      // if (q.length === 0) {
+      //   console.log('foo')
+      // }
       if (list.length !== 0) {
         innerLvl += 1;
         structure[`level_${innerLvl}`] = list;
@@ -32,6 +37,10 @@ export class CommonUtils {
           q.push(v.children[i]! as HTMLElement);
         }
       }
+      console.log('v: ', v)
+      console.log('list: ', list)
+      console.log('q: ', q)
+      console.log('structure: ', structure)
     }
     return structure;
   }

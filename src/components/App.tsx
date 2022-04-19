@@ -7,10 +7,11 @@ export default function App() {
   const { currentDragTarget: dragTarget } = useGlobalStates();
   const dropOptions: IDropOptions = {
     currentItemCategory: {
-      level0: ['test1'],
-      level1: ['test2', 'test3', 'test4', 'test5', 'test6', 'test7'],
-      // level2: ['test3']
-    }
+      level0: ['dropRef'],
+      level1: ['item 1', 'item 2'],
+      level2: ['test3']
+    },
+    applyToChildren: true
   };
   const dragOptions: IDragOptions = {
     currentItemCategory: {
@@ -68,11 +69,19 @@ export default function App() {
               }
             }}
           >
-            <div className="item">item 1</div>
-            <div className="item">item 2</div>
-            <div className="item">item 3</div>
-            <div className="item">item 4</div>
-            <div className="item">item 5</div>
+            dropRef
+            <div className="item cnt">
+              item 1
+              <div className="item">item 3</div>
+              <div className="item">item 4</div>
+              <div className="item">item 5</div>
+            </div>
+            <div className="item cnt">
+              item 2
+              <div className="item">item 6</div>
+              <div className="item">item 7</div>
+              <div className="item">item 8</div>
+            </div>
           </div>
         </div>
       </div>
