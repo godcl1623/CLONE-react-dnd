@@ -40,25 +40,33 @@ export default function useDropClone(option: IDropOptions): any {
     });
   };
 
-  const initiateDropInfo = useCallback((e: Event) => {
-    if (dropMap) {
-      const htmlTarget = e.target! as HTMLElement;
-      const levelIncludesDropTarget = Object.values(dropMap).find((level: any) => level.includes(htmlTarget));
-      const levelOfDropTarget = Object.values(dropMap).indexOf(levelIncludesDropTarget! as HTMLElement[]);
-      const targetIdxInNodes = (currentItemCategory as (string | string[])[]).length > 1 ? Array.from((htmlTarget.parentNode! as HTMLElement).childNodes).indexOf(htmlTarget) : 0;
-      if (currentItemCategory) {
-        let dropCategory = '';
-        if (applyToChildren) {
-          dropCategory = Object.values(currentItemCategory)[levelOfDropTarget][targetIdxInNodes];
-        } else {
-          dropCategory = Object.values(currentItemCategory)[0][targetIdxInNodes];
-        }
-        if (dropCategory) {
-          setDropCat(dropCategory);
+  const initiateDropInfo = useCallback(
+    (e: Event) => {
+      if (dropMap) {
+        console.log(dropMap)
+        const htmlTarget = e.target! as HTMLElement;
+        const levelIncludesDropTarget = Object.values(dropMap).find((level: any) => level.includes(htmlTarget));
+        const levelOfDropTarget = Object.values(dropMap).indexOf(levelIncludesDropTarget! as HTMLElement[]);
+        const targetIdxInNodes =
+          Object.values(currentItemCategory as any).length > 1
+            ? Array.from((htmlTarget.parentNode! as HTMLElement).childNodes).indexOf(htmlTarget)
+            : 0;
+        if (currentItemCategory) {
+          let dropCategory = '';
+          if (applyToChildren) {
+            dropCategory = Object.values(currentItemCategory)[levelOfDropTarget][targetIdxInNodes];
+          } else {
+            dropCategory = Object.values(currentItemCategory)[0][targetIdxInNodes];
+          }
+          if (dropCategory) {
+            setDropCat(dropCategory);
+            console.log(dropCategory);
+          }
         }
       }
-    }
-  }, [dropMap]);
+    },
+    [dropMap]
+  );
 
   const runDropHandler = useCallback(
     (e: Event) => {
@@ -99,8 +107,13 @@ export default function useDropClone(option: IDropOptions): any {
   useEffect(() => {
     const dropzoneRef = dropRef.current! as HTMLElement;
     dropzoneRef.addEventListener('drop', runDropHandler);
+    dropzoneRef.addEventListener('click', initiateDropInfo);
     return () => dropzoneRef.removeEventListener('drop', runDropHandler);
   }, [runDropHandler]);
+
+  useEffect(() => {
+    console.log((dropRef.current! as any).children)
+  }, [dropRef.current])
 
   return [dropRef, lastdropResult];
 }
