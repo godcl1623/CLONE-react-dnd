@@ -1,9 +1,12 @@
+import React from 'react';
 import '../styles/style.css';
 import useDropClone, { IDropOptions } from '../hooks/useDropClone';
 import useDragClone, { IDragOptions } from '../hooks/useDragClone';
 import useGlobalStates from '../hooks/useGlobalStates';
 
 export default function App() {
+  const drop = React.useRef<any>();
+  const drag = React.useRef<any>();
   const { currentDragTarget: dragTarget } = useGlobalStates();
   const dropOptions: IDropOptions = {
     currentItemCategory: {
@@ -18,13 +21,18 @@ export default function App() {
       level0: ['test1', 'test2', 'test3', 'test4', 'test5', 'test6'],
     }
   };
-  const [dropRef, dropResult] = useDropClone(dropOptions);
-  const [dragRef, dragInfo, setSettings] = useDragClone(dragOptions);
-  const { updateGlobalDragTarget } = setSettings;
+  // const [dropRef, dropResult] = useDropClone(dropOptions);
+  // const [dragRef, dragInfo, setSettings] = useDragClone(dragOptions);
+  // const { updateGlobalDragTarget } = setSettings;
+  React.useEffect(() => {
+    if (drag.current) {
+      drag.current.childNodes.forEach((ele: any) => { ele.draggable = true });
+    }
+  }, [drag.current])
 
   return (
     <div id="App">
-      <div id="dnd-test-zone">
+      {/* <div id="dnd-test-zone">
         <div
           id="dropzone"
         >
@@ -84,6 +92,18 @@ export default function App() {
             </div>
           </div>
         </div>
+      </div> */}
+      <div
+        id="dropzone"
+        ref={drop}
+      >
+
+      </div>
+      <div className="cnt" ref={drag} onDrag={e => console.log(e.clientY)} onDragEnd={e => console.log(e.clientY)}>
+        <div className="item"></div>
+        <div className="item"></div>
+        <div className="item"></div>
+        <div className="item"></div>
       </div>
     </div>
   );
