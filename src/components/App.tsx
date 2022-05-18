@@ -96,10 +96,12 @@ export default function App() {
       <div
         id="dropzone"
         ref={drop}
+        onDragOver={e => e.preventDefault()}
+        onDrop={e => console.log('drop', console.log(e.clientY))}
       >
 
       </div>
-      <div className="cnt" ref={drag} onDrag={e => console.log(e.clientY)} onDragEnd={e => console.log(e.clientY)}>
+      <div className="cnt" ref={drag} onDrag={e => console.log('dragging', e.clientY)} onDragEnd={e => console.log('dragEnd', e.clientY)} onDragOver={e => e.preventDefault()} onDrop={e => console.log('drop', e.clientY)}>
         <div className="item"></div>
         <div className="item"></div>
         <div className="item"></div>
