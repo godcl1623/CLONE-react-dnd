@@ -8,12 +8,13 @@ type DragStartInfo = {
 };
 
 export default function useDragClone(option: IDragOptions): any[] {
-  const { isDropped, currentDragCategory, setDragTgt, setDragCat, setDropState } = useStore();
+  const { isDropped, currentDragCategory, setDragTgt, setDragCat, setDropState } =
+    useStore();
   const [isDraggable, makeDraggable] = useState(true);
   const [refresher, setRefresher] = useState();
   const [startInfo, setStartInfo] = useState<DragStartInfo>({
     startEleInfo: null,
-    startCoords: null
+    startCoords: null,
   });
   const [dragMap, setDragMap] = useState<any>(null);
   const dragRef = useRef(null);
@@ -21,11 +22,7 @@ export default function useDragClone(option: IDragOptions): any[] {
 
   const updateGlobalDragTarget = (dragTarget: HTMLElement) => setDragTgt(dragTarget);
 
-  const {
-    currentItemCategory,
-    disableCurrent,
-    applyToChildren,
-  } = option;
+  const { currentItemCategory, disableCurrent, applyToChildren } = option;
 
   const updateStartInfo = (
     startEleInfo: DOMRect = startInfo.startEleInfo! as DOMRect,
@@ -34,7 +31,7 @@ export default function useDragClone(option: IDragOptions): any[] {
     setStartInfo({
       ...startInfo,
       startEleInfo,
-      startCoords
+      startCoords,
     });
   };
 
@@ -63,25 +60,11 @@ export default function useDragClone(option: IDragOptions): any[] {
     [dragMap, isDropped, currentDragCategory]
   );
 
-  const updateDroppedTargetInfo = useCallback(
-    (e: Event) => {
-      if (isDropped) {
-        if (startInfo.startEleInfo) {
-          updateStartInfo(
-            (e.target! as HTMLElement).getBoundingClientRect(),
-            e! as DragEvent
-          );
-        }
-      }
-    },
-    [isDropped]
-  );
-
   const setSettings: any = {
     updateGlobalDragTarget,
     setRefresher,
-    makeDraggable
-  }
+    makeDraggable,
+  };
 
   /* ############### 드래그 구조 업데이트 ############### */
   useEffect(() => {
@@ -138,33 +121,6 @@ export default function useDragClone(option: IDragOptions): any[] {
       dragItemsCnt.childNodes.forEach(item => item.removeEventListener('dragstart', updateDragTargetInfo));
     };
   }, [updateDragTargetInfo]);
-
-  /* ############### 드롭 대상 정보 업데이트 ############### */
-  // useEffect(() => {
-  //   const dragItemsCnt = dragRef.current! as HTMLElement;
-  //   if ((disableCurrent == null || disableCurrent) && (applyToChildren == null || applyToChildren)) {
-  //     // 기본값: 자식 요소만 적용
-  //     dragItemsCnt.childNodes.forEach(item => item.addEventListener('dragend', updateDroppedTargetInfo));
-  //   } else if (!(disableCurrent == null || disableCurrent) && (applyToChildren == null || applyToChildren)) {
-  //     // 컨테이너, 자식 요소 모두 적용
-  //     dragItemsCnt.addEventListener('dragend', updateDroppedTargetInfo);
-  //   } else if ((disableCurrent == null || disableCurrent) && !(applyToChildren == null || applyToChildren)) {
-  //     // 컨테이너만 적용
-  //     dragItemsCnt.addEventListener('dragend', updateDroppedTargetInfo);
-  //     dragItemsCnt.childNodes.forEach(item =>
-  //       item.addEventListener('dragend', (e: Event) => {
-  //         e.preventDefault();
-  //         e.stopPropagation();
-  //       })
-  //     );
-  //   } else {
-  //     throw new Error('Invalid Option! Change the value of disableCurrent or applyToChildren!');
-  //   }
-  //   return () => {
-  //     dragItemsCnt.removeEventListener('dragend', updateDroppedTargetInfo);
-  //     dragItemsCnt.childNodes.forEach(item => item.removeEventListener('dragend', updateDroppedTargetInfo));
-  //   };
-  // }, [updateDroppedTargetInfo]);
 
   return [dragRef, startInfo, setSettings];
 }

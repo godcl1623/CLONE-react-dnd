@@ -37,10 +37,10 @@ export class CommonUtils {
           q.push(v.children[i]! as HTMLElement);
         }
       }
-      console.log('v: ', v)
-      console.log('list: ', list)
-      console.log('q: ', q)
-      console.log('structure: ', structure)
+      // console.log('v: ', v)
+      // console.log('list: ', list)
+      // console.log('q: ', q)
+      // console.log('structure: ', structure)
     }
     return structure;
   }

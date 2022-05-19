@@ -128,9 +128,5 @@ export default function useDropClone(option: IDropOptions): any {
     return () => dropzoneRef.removeEventListener('drop', runDropHandler);
   }, [runDropHandler]);
 
-  useEffect(() => {
-    console.log((dropRef.current! as any).children)
-  }, [dropRef.current])
-
-  return [dropRef, lastdropResult];
+  return [dropRef, dropInfo, lastdropResult];
 }
