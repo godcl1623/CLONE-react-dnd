@@ -7,6 +7,10 @@ type DropResult = {
   lastDroppedLevel: number;
   lastDroppedResult: string;
 };
+type DropInfo = {
+  dropEleInfo: DOMRect | null;
+  dropCoords: DragEvent | null;
+}
 
 export default function useDropClone(option: IDropOptions): any {
   /* ############### state 정리 ############### */
@@ -24,6 +28,10 @@ export default function useDropClone(option: IDropOptions): any {
     lastDroppedLevel: -1,
     lastDroppedResult: '',
   });
+  const [dropInfo, setDropInfo] = useState<DropInfo>({
+    dropEleInfo: null,
+    dropCoords: null
+  });
   const dropRef = useRef(null);
   const utils = new CommonUtils();
 
@@ -39,11 +47,20 @@ export default function useDropClone(option: IDropOptions): any {
       lastDroppedResult,
     });
   };
+  const updateDropInfo = (
+    rectInfo: DOMRect = (dropInfo! as DropInfo).dropEleInfo as DOMRect,
+    eventRes: DragEvent = (dropInfo! as DropInfo).dropCoords as DragEvent
+  ): void => {
+    setDropInfo({
+      ...dropInfo,
+      dropEleInfo: rectInfo,
+      dropCoords: eventRes
+    });
+  };
 
   const initiateDropInfo = useCallback(
     (e: Event) => {
       if (dropMap) {
-        console.log(dropMap)
         const htmlTarget = e.target! as HTMLElement;
         const levelIncludesDropTarget = Object.values(dropMap).find((level: any) => level.includes(htmlTarget));
         const levelOfDropTarget = Object.values(dropMap).indexOf(levelIncludesDropTarget! as HTMLElement[]);
@@ -60,7 +77,6 @@ export default function useDropClone(option: IDropOptions): any {
           }
           if (dropCategory) {
             setDropCat(dropCategory);
-            console.log(dropCategory);
           }
         }
       }
@@ -79,6 +95,7 @@ export default function useDropClone(option: IDropOptions): any {
         const levelIncludesDropTarget = Object.values(dropMap).find((level: any) => level.includes(htmlTarget));
         const levelOfDropTarget = Object.values(dropMap).indexOf(levelIncludesDropTarget! as HTMLElement[]);
         updateDropResult(levelOfDropTarget, levelOfDropTarget === 0 ? 'root' : 'child');
+        updateDropInfo((e.target! as HTMLElement).getBoundingClientRect(), e! as DragEvent);
       }
     },
     [currentDragCategory, currentDropCategory]
@@ -111,9 +128,5 @@ export default function useDropClone(option: IDropOptions): any {
     return () => dropzoneRef.removeEventListener('drop', runDropHandler);
   }, [runDropHandler]);
 
-  useEffect(() => {
-    console.log((dropRef.current! as any).children)
-  }, [dropRef.current])
-
-  return [dropRef, lastdropResult];
+  return [dropRef, dropInfo, lastdropResult];
 }
