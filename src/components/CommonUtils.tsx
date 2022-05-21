@@ -47,10 +47,10 @@ export class CommonUtils {
 }
 
 export const useStore = create<any>(devtools(set => ({
-  currentDragTarget: null,
-  setDragTgt(dragTarget: HTMLElement | null): void {
-    set({ currentDragTarget: dragTarget });
-  },
+  // currentDragTarget: null,
+  // setDragTgt(dragTarget: HTMLElement | null): void {
+  //   set({ currentDragTarget: dragTarget });
+  // },
   currentDragCategory: '',
   setDragCat(category: string): void {
     set({ currentDragCategory: category });

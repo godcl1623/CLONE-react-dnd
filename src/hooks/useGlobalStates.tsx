@@ -2,7 +2,7 @@ import { useStore } from '../components/CommonUtils';
 
 export default function useGlobalStates() {
   const {
-    currentDragTarget,
+    // currentDragTarget,
     currentDropTarget,
     currentDragCategory,
     currentDropCategory,
@@ -11,7 +11,7 @@ export default function useGlobalStates() {
   } = useStore();
 
   return {
-    currentDragTarget,
+    // currentDragTarget,
     currentDropTarget,
     currentDragCategory,
     currentDropCategory,

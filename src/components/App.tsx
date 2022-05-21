@@ -7,7 +7,7 @@ import useGlobalStates from '../hooks/useGlobalStates';
 export default function App() {
   const drop = React.useRef<any>();
   const drag = React.useRef<any>();
-  const { currentDragTarget: dragTarget } = useGlobalStates();
+  // const { currentDragTarget: dragTarget } = useGlobalStates();
   const dropOptions: IDropOptions = {
     currentItemCategory: {
       level0: ['dropRef'],

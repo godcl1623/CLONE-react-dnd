@@ -1,15 +1,22 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { BasicDndOptions, CommonUtils, useStore } from '../components/CommonUtils';
 
+/* ############### 사용 타입 정리 ############### */
+// Hook 초기화용 props 타입
 export type IDragOptions = BasicDndOptions;
+// 드래그 시작 시점 정보 타입
 type DragStartInfo = {
   startEleInfo: DOMRect | null;
   startCoords: DragEvent | null;
 };
 
 export default function useDragClone(option: IDragOptions): any[] {
-  const { isDropped, currentDragCategory, setDragTgt, setDragCat, setDropState } =
+  /* ############### 전역 상태 ############### */
+  // const { isDropped, currentDragCategory, setDragTgt, setDragCat, setDropState } =
+  //   useStore();
+  const { isDropped, currentDragCategory, setDragCat, setDropState } =
     useStore();
+  /* ############### 지역 상태 ############### */
   const [isDraggable, makeDraggable] = useState(true);
   const [refresher, setRefresher] = useState();
   const [startInfo, setStartInfo] = useState<DragStartInfo>({
@@ -17,13 +24,18 @@ export default function useDragClone(option: IDragOptions): any[] {
     startCoords: null,
   });
   const [dragMap, setDragMap] = useState<any>(null);
+  /* ############### 드래그 컨테이너용 Ref ############### */
   const dragRef = useRef(null);
+  /* ############### 카테고리 부여 등 기능 활용을 위한 클래스 인스턴스 ############### */
   const utils = new CommonUtils();
 
-  const updateGlobalDragTarget = (dragTarget: HTMLElement) => setDragTgt(dragTarget);
+  // const updateGlobalDragTarget = (dragTarget: HTMLElement) => setDragTgt(dragTarget);
 
+  /* ############### 사용 옵션 목록 ############### */
   const { currentItemCategory, disableCurrent, applyToChildren } = option;
 
+  /* ############### 내부 함수 ############### */
+  // updateStartInfo(): 드래그 시작 대상의 좌표 등 정보 업데이트(좌표 상태만)
   const updateStartInfo = (
     startEleInfo: DOMRect = startInfo.startEleInfo! as DOMRect,
     startCoords: DragEvent = startInfo.startCoords! as DragEvent
@@ -35,6 +47,7 @@ export default function useDragClone(option: IDragOptions): any[] {
     });
   };
 
+  // updateDragTargetInfo(): 드래그 시작 대상 정보 업데이트를 위한 함수(정보 업데이트 로직)
   const updateDragTargetInfo = useCallback(
     (e: Event) => {
       const currentDragMap = disableCurrent ? Object.values(dragMap).slice(1) : Object.values(dragMap);
@@ -60,8 +73,9 @@ export default function useDragClone(option: IDragOptions): any[] {
     [dragMap, isDropped, currentDragCategory]
   );
 
+  // 사용자가 활용할 수 있는 도구 모음
   const setSettings: any = {
-    updateGlobalDragTarget,
+    // updateGlobalDragTarget,
     setRefresher,
     makeDraggable,
   };

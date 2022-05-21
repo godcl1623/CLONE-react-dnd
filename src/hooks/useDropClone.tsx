@@ -1,12 +1,16 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { BasicDndOptions, CommonUtils, useStore } from '../components/CommonUtils';
 
+/* ############### 사용 타입 정리 ############### */
+// Hook 초기화용 props 타입
 // export type IDropOptions = Omit<BasicDndOptions, 'disableCurrent' | 'applyToChildren'>;
 export type IDropOptions = BasicDndOptions;
-type DropResult = {
-  lastDroppedLevel: number;
-  lastDroppedResult: string;
+// 디버깅용 정보 타입
+type __DebugDropResult = {
+  __DebugLastDroppedLevel: number;
+  __DebugLastDroppedResult: string;
 };
+// 드롭 시점 정보 타입
 type DropInfo = {
   dropEleInfo: DOMRect | null;
   dropCoords: DragEvent | null;
@@ -14,6 +18,7 @@ type DropInfo = {
 
 export default function useDropClone(option: IDropOptions): any {
   /* ############### state 정리 ############### */
+  // 전역 상태 모음
   const {
     dropMap,
     currentDragCategory,
@@ -24,29 +29,36 @@ export default function useDropClone(option: IDropOptions): any {
     setDropState,
     setDropMap,
   } = useStore();
-  const [lastdropResult, setDropResult] = useState<DropResult>({
-    lastDroppedLevel: -1,
-    lastDroppedResult: '',
+  // 지역 상태 모음
+  const [__DebugLastdropResult, setDropResult] = useState<__DebugDropResult>({
+    __DebugLastDroppedLevel: -1,
+    __DebugLastDroppedResult: '',
   });
   const [dropInfo, setDropInfo] = useState<DropInfo>({
     dropEleInfo: null,
     dropCoords: null
   });
+  /* ############### 드롭 컨테이너용 Ref ############### */
   const dropRef = useRef(null);
+  /* ############### 카테고리 부여 등 기능 활용을 위한 클래스 인스턴스 ############### */
   const utils = new CommonUtils();
 
+  /* ############### 사용 옵션 목록 ############### */
   const { currentItemCategory, applyToChildren } = option;
 
-  const updateDropResult = (
-    lastDroppedLevel: number = (lastdropResult! as DropResult).lastDroppedLevel,
-    lastDroppedResult: string = (lastdropResult! as DropResult).lastDroppedResult
+  /* ############### 내부 함수 ############### */
+  // __updateDebugDropResult(): 디버깅용 정보 업데이트
+  const __updateDebugDropResult = (
+    __DebugLastDroppedLevel: number = (__DebugLastdropResult! as __DebugDropResult).__DebugLastDroppedLevel,
+    __DebugLastDroppedResult: string = (__DebugLastdropResult! as __DebugDropResult).__DebugLastDroppedResult
   ): void => {
     setDropResult({
-      ...lastdropResult,
-      lastDroppedLevel,
-      lastDroppedResult,
+      ...__DebugLastdropResult,
+      __DebugLastDroppedLevel,
+      __DebugLastDroppedResult,
     });
   };
+  // updateDropInfo(): 드롭 지점의 좌표 등 정보 업데이트(좌표 상태만)
   const updateDropInfo = (
     rectInfo: DOMRect = (dropInfo! as DropInfo).dropEleInfo as DOMRect,
     eventRes: DragEvent = (dropInfo! as DropInfo).dropCoords as DragEvent
@@ -58,6 +70,7 @@ export default function useDropClone(option: IDropOptions): any {
     });
   };
 
+  // initiateDropInfo(): 드롭 대상에 카테고리 부여, 드롭 대상 초기화
   const initiateDropInfo = useCallback(
     (e: Event) => {
       if (dropMap) {
@@ -84,6 +97,7 @@ export default function useDropClone(option: IDropOptions): any {
     [dropMap]
   );
 
+  // runDropHandler(): 드롭 지점 정보 업데이트를 위한 함수(정보 업데이트 로직)
   const runDropHandler = useCallback(
     (e: Event) => {
       if (e.target !== currentDropTarget) {
@@ -94,7 +108,7 @@ export default function useDropClone(option: IDropOptions): any {
         const htmlTarget = e.target! as HTMLElement;
         const levelIncludesDropTarget = Object.values(dropMap).find((level: any) => level.includes(htmlTarget));
         const levelOfDropTarget = Object.values(dropMap).indexOf(levelIncludesDropTarget! as HTMLElement[]);
-        updateDropResult(levelOfDropTarget, levelOfDropTarget === 0 ? 'root' : 'child');
+        __updateDebugDropResult(levelOfDropTarget, levelOfDropTarget === 0 ? 'root' : 'child');
         updateDropInfo((e.target! as HTMLElement).getBoundingClientRect(), e! as DragEvent);
       }
     },
@@ -128,5 +142,5 @@ export default function useDropClone(option: IDropOptions): any {
     return () => dropzoneRef.removeEventListener('drop', runDropHandler);
   }, [runDropHandler]);
 
-  return [dropRef, dropInfo, lastdropResult];
+  return [dropRef, dropInfo, __DebugLastdropResult];
 }
