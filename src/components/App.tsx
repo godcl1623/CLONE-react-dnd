@@ -46,17 +46,29 @@ export default function App() {
             onDrop={e => console.log(dropInfo)}
           >
             dropRef
-            <div className="item cnt">
+            <div className="item cnt 1">
               item 1
-              <div className="item">item 3</div>
-              <div className="item">item 4</div>
-              <div className="item">item 5</div>
+              <div className="item 3">
+                <div className="item 3-1">item 3-1</div>
+                <div className="item 3-2">item 3-2</div>
+                <div className="item 3-3">item 3-3</div>
+                <div className="item 3-4">item 3-4</div>
+              </div>
+              <div className="item 4">item 4</div>
+              <div className="item 5">
+                <div className="item 5-1">item 5-1</div>
+                <div className="item 5-2">item 5-2</div>
+                <div className="item 5-3">item 5-3</div>
+                <div className="item 5-4">item 5-4</div>
+                <div className="item 5-5">item 5-5</div>
+                <div className="item 5-6">item 5-6</div>
+              </div>
             </div>
-            <div className="item cnt">
+            <div className="item cnt 2">
               item 2
-              <div className="item">item 6</div>
-              <div className="item">item 7</div>
-              <div className="item">item 8</div>
+              <div className="item 6">item 6</div>
+              <div className="item 7">item 7</div>
+              <div className="item 8">item 8</div>
             </div>
           </div>
         </div>
