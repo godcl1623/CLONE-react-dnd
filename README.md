@@ -44,7 +44,7 @@
 
 * **상세 기능**
   * 대상에 토글 가능한 드래그 속성 부여
-  * 드래그 시작 지점, 종료 지점의 좌표, 드래그 대상 정보 제공
+  * 드래그 시작 지점 좌표, 드래그 대상 정보 제공
 
   <details>
   <summary>상세 설명</summary>
@@ -66,12 +66,11 @@
 
     const [dragRef, dragInfo, setSettings] = useDragClone(dragOption);
 
-    const { updateGlobalDragTarget, makeDraggable, setRefresher } = setSettings;
+    const { makeDraggable, setRefresher } = setSettings;
 
     return (
       <div
         ref={dragRef}
-        onDragStart={e => updateGlobalDragTarget(e.target)}
       >
         { ... }
       </div>
@@ -89,13 +88,11 @@
 
   * **반환 배열**
     * **[0]**(`dragRef`)**(필수)**: 대상에 드래그 속성을 부여합니다.
-    * **[1]**(`dragInfo`): 드래그 앤 드롭 구현에 사용할 수 있는 데이터를 담은 객체입니다. 시작 시점 정보를 담은 `startInfo` 객체, 드롭 시점 정보를 담은 `lastInfo` 객체를 포함합니다.
-      * `*Info` 객체는 각각 `*EleInfo`, `*Coords` 객체를 포함합니다.
-      * `*EleInfo`는 `getBoundingClientRect()`로 반환된 정보를 담고 있습니다.
-      * `*Coords`는 `DragEvent`로 반환된 정보를 담고 있습니다.
+    * **[1]**(`dragInfo`): 드래그 앤 드롭 구현에 사용할 수 있는 데이터를 담은 객체로, 드래그 시작 시점의 드래그 요소의 좌표 정보, 스타일 정보를 반환합니다.
+      * `dragInfo` 객체는 각각 `startEleInfo`, `startCoords` 객체를 포함합니다.
+      * `startEleInfo`는 `getBoundingClientRect()`로 반환된 정보를 담고 있습니다.
+      * `startCoords`는 `DragEvent`로 반환된 정보를 담고 있습니다.
     * **[2]**(`setSettings`): 드래그 앤 드롭 구현에 사용할 수 있는 메서드를 포함하는 객체입니다.
-      * `updateGlobalDragTarget()`**(필수)**: `dragInfo` 계산을 위해 현재 드래그 중인 대상을 지정하는 메서드입니다.
-        * `onDragStart` 이벤트의 `event.target`을 파라미터로 합니다.
       * `setRefresher()`: DOM 노드가 새로 생성되어 재렌더링이 발생했을 때, 새로 생성된 노드에도 드래그 속성을 부여하기 위해 사용하는 메서드입니다.
         * `onChange` 이벤트의 `event.target`을 파라미터로 합니다.
       * `makeDraggable(param: boolean)`: 드래그 속성이 토글 형식으로 부여되도록 설정하는 메서드입니다.
@@ -154,9 +151,13 @@
 
     * **반환 배열**
       * **[0]**(`dropRef`)**(필수)**: 대상에 드롭 이벤트를 부여합니다.
-      * **[1]**(`lastDropResult`): 디버깅 용도로 사용할 수 있는 정보를 담은 객체입니다. `lastDroppedLevel` 프로퍼티와 `lastDroppedResult` 프로퍼티를 담고 있습니다.
-        * `lastDroppedLevel`: 드래그 대상이 드롭된 깊이를 나타냅니다. `dropRef`를 기준으로 0부터 시작하며, 중첩이 발생할 때마다 1씩 증가합니다.
-        * `lastDroppedResult`: 드롭된 대상이 `dropRef`인지, 자식 요소인지를 나타냅니다. 드롭 대상이 `dropRef`일 경우 `root`, 자식 요소일 경우 `child`가 값이 됩니다.
+      * **[1]**(`dropInfo`): 드래그 앤 드롭 구현에 사용할 수 있는 데이터를 담은 객체로, 드롭 시점의 드래그 요소의 좌표 정보, 스타일 정보를 반환합니다.
+      * `dropInfo` 객체는 각각 `dropEleInfo`, `dropCoords` 객체를 포함합니다.
+      * `dropEleInfo`는 `getBoundingClientRect()`로 반환된 정보를 담고 있습니다.
+      * `dropCoords`는 `DragEvent`로 반환된 정보를 담고 있습니다.
+      * **[2]**(`__DebugLastDropResult`): 디버깅 용도로 사용할 수 있는 정보를 담은 객체입니다. `__DebugLastDroppedLevel` 프로퍼티와 `__DebugLastDroppedResult` 프로퍼티를 담고 있습니다.
+        * `__DebugLastDroppedLevel`: 드래그 대상이 드롭된 깊이를 나타냅니다. `dropRef`를 기준으로 0부터 시작하며, 중첩이 발생할 때마다 1씩 증가합니다.
+        * `__DebugLastDroppedResult`: 드롭된 대상이 `dropRef`인지, 자식 요소인지를 나타냅니다. 드롭 대상이 `dropRef`일 경우 `root`, 자식 요소일 경우 `child`가 값이 됩니다.
 
   </div>
   </details>
