@@ -49,19 +49,9 @@ export default function App() {
             <div className="item cnt 1">
               item 1
               <div className="item 3">
-                <div className="item 3-1">item 3-1</div>
-                <div className="item 3-2">item 3-2</div>
-                <div className="item 3-3">item 3-3</div>
-                <div className="item 3-4">item 3-4</div>
               </div>
               <div className="item 4">item 4</div>
               <div className="item 5">
-                <div className="item 5-1">item 5-1</div>
-                <div className="item 5-2">item 5-2</div>
-                <div className="item 5-3">item 5-3</div>
-                <div className="item 5-4">item 5-4</div>
-                <div className="item 5-5">item 5-5</div>
-                <div className="item 5-6">item 5-6</div>
               </div>
             </div>
             <div className="item cnt 2">

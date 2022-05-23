@@ -21,28 +21,38 @@ export class CommonUtils {
     const structure: Structure = {};
     const q: HTMLElement[] = [node];
     let innerLvl: number = lvl;
-    // let nextLvlChildren: number = 0;
-    structure[`level_${innerLvl}`] = [node];
+    let numOfNextLvl: number = 0;
+    structure[`level_${innerLvl}`] = [];
+    let temporaryStorage = [];
     while (q.length !== 0) {
-      const v: HTMLElement = q.shift()! as HTMLElement;
-      const list: HTMLElement[] = Array.from(v.children)! as HTMLElement[];
-      // if (q.length === 0) {
-      //   innerLvl += 1;
-      // }
-      if (list.length !== 0) {
+      const currentElement: HTMLElement = q.shift()! as HTMLElement;
+      if (innerLvl === lvl) {
+        structure[`level_${innerLvl}`].push(currentElement);
+        Array.from(currentElement.children).forEach(child => q.push(child as HTMLElement));
         innerLvl += 1;
-        structure[`level_${innerLvl}`] = list;
-        for (let i = 0; i < v.children.length; i++) {
-          q.push(v.children[i]! as HTMLElement);
+        numOfNextLvl += currentElement.children.length;
+      } else {
+        temporaryStorage.push(currentElement);
+        if (numOfNextLvl === temporaryStorage.length) {
+          structure[`level_${innerLvl}`] = temporaryStorage;
+          const rawCurrEleChildren = temporaryStorage.map(child => Array.from(child.children));
+          const procCurrEleChildren = rawCurrEleChildren.reduce((acc, curr) => acc.concat(curr));
+          procCurrEleChildren.forEach(child => q.push(child as HTMLElement));
+          numOfNextLvl = procCurrEleChildren.length;
+          temporaryStorage = [];
+          innerLvl += 1;
         }
       }
-      // structure[`level_${innerLvl}`] = [];
-      // while (list.length !== 0) {
-      //   const w: HTMLElement = list.shift()! as HTMLElement;
-      //   structure[`level_${innerLvl}`].push(w);
+      /* ### 원본 로직 ### */
+      // if (list.length !== 0) {
+      //   innerLvl += 1;
+      //   structure[`level_${innerLvl}`] = list;
+      //   for (let i = 0; i < v.children.length; i++) {
+      //     q.push(v.children[i]! as HTMLElement);
+      //   }
       // }
     }
-    // console.log(structure)
+    console.log(structure)
     return structure;
   }
 }
