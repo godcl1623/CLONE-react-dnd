@@ -60,8 +60,8 @@ export default function useDropClone(option: IDropOptions): any {
   };
   // updateDropInfo(): 드롭 지점의 좌표 등 정보 업데이트(좌표 상태만)
   const updateDropInfo = (
-    rectInfo: DOMRect = (dropInfo! as DropInfo).dropEleInfo as DOMRect,
-    eventRes: DragEvent = (dropInfo! as DropInfo).dropCoords as DragEvent
+    rectInfo: DOMRect | null = (dropInfo! as DropInfo).dropEleInfo as DOMRect,
+    eventRes: DragEvent | null = (dropInfo! as DropInfo).dropCoords as DragEvent
   ): void => {
     setDropInfo({
       ...dropInfo,
@@ -109,11 +109,19 @@ export default function useDropClone(option: IDropOptions): any {
         const levelIncludesDropTarget = Object.values(dropMap).find((level: any) => level.includes(htmlTarget));
         const levelOfDropTarget = Object.values(dropMap).indexOf(levelIncludesDropTarget! as HTMLElement[]);
         __updateDebugDropResult(levelOfDropTarget, levelOfDropTarget === 0 ? 'root' : 'child');
-        updateDropInfo((e.target! as HTMLElement).getBoundingClientRect(), e! as DragEvent);
+        if (currentDragCategory === currentDropCategory) {
+          updateDropInfo((e.target! as HTMLElement).getBoundingClientRect(), e! as DragEvent);
+        } else {
+          updateDropInfo(null, null);
+        }
       }
     },
     [currentDragCategory, currentDropCategory]
   );
+
+  // useEffect(() => {
+  //   console.log(dropMap)
+  // }, [dropMap])
 
   /* ############### drop 구조 정리 ############### */
   useEffect(() => {

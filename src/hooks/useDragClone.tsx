@@ -54,9 +54,10 @@ export default function useDragClone(option: IDragOptions): any[] {
       const dragMapIncludesTarget = currentDragMap.find(level =>
         (level! as HTMLElement[]).includes(e.target! as HTMLElement)
       );
+      const currentDragItemLvl = currentDragMap.indexOf(dragMapIncludesTarget);
       const currentDragItemIdx = (dragMapIncludesTarget! as HTMLElement[]).indexOf(e.target! as HTMLElement);
       if (currentItemCategory) {
-        const categoryList = Object.values(currentItemCategory)[0];
+        const categoryList = Object.values(currentItemCategory)[currentDragItemLvl];
         if (currentDragCategory !== categoryList[currentDragItemIdx]) {
           if (categoryList.length !== 1) {
             setDragCat(categoryList[currentDragItemIdx]);
@@ -79,6 +80,10 @@ export default function useDragClone(option: IDragOptions): any[] {
     setRefresher,
     makeDraggable,
   };
+
+  // useEffect(() => {
+  //   console.log(dragMap)
+  // }, [dragMap])
 
   /* ############### 드래그 구조 업데이트 ############### */
   useEffect(() => {

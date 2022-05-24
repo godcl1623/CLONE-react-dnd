@@ -43,16 +43,7 @@ export class CommonUtils {
           innerLvl += 1;
         }
       }
-      /* ### 원본 로직 ### */
-      // if (list.length !== 0) {
-      //   innerLvl += 1;
-      //   structure[`level_${innerLvl}`] = list;
-      //   for (let i = 0; i < v.children.length; i++) {
-      //     q.push(v.children[i]! as HTMLElement);
-      //   }
-      // }
     }
-    console.log(structure)
     return structure;
   }
 }
