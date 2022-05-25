@@ -103,7 +103,7 @@ export default function useDropClone(option: IDropOptions): any {
       if (e.target !== currentDropTarget) {
         setDropTgt(e.target! as HTMLElement);
       }
-      setDropState(true);
+      // setDropState(true);
       if (dropMap) {
         const htmlTarget = e.target! as HTMLElement;
         const levelIncludesDropTarget = Object.values(dropMap).find((level: any) => level.includes(htmlTarget));
@@ -111,6 +111,7 @@ export default function useDropClone(option: IDropOptions): any {
         __updateDebugDropResult(levelOfDropTarget, levelOfDropTarget === 0 ? 'root' : 'child');
         if (currentDragCategory === currentDropCategory) {
           updateDropInfo((e.target! as HTMLElement).getBoundingClientRect(), e! as DragEvent);
+          setDropState(true);
         } else {
           updateDropInfo(null, null);
         }

@@ -96,14 +96,18 @@ export default function useDragClone(option: IDragOptions): any[] {
   useEffect(() => {
     const dragItemsCnt = dragRef.current! as HTMLElement;
     if ((disableCurrent == null || disableCurrent) && (applyToChildren == null || applyToChildren)) {
+      // console.log('foo')
+      // console.log(disableCurrent == null || disableCurrent)
       // 기본값: 자식 요소만 적용
       dragItemsCnt.childNodes.forEach(item => {
         (item! as HTMLElement).draggable = isDraggable;
       });
     } else if (!(disableCurrent == null || disableCurrent) && (applyToChildren == null || applyToChildren)) {
+      // console.log('bar')
       // 컨테이너, 자식 요소 모두 적용
       dragItemsCnt.draggable = isDraggable;
     } else if ((disableCurrent == null || disableCurrent) && !(applyToChildren == null || applyToChildren)) {
+      // console.log('doh')
       // 컨테이너만 적용
       dragItemsCnt.draggable = isDraggable;
       dragItemsCnt.childNodes.forEach(item => {

@@ -7,7 +7,7 @@ import useGlobalStates from '../hooks/useGlobalStates';
 export default function App() {
   const drop = React.useRef<any>();
   const drag = React.useRef<any>();
-  // const { currentDragTarget: dragTarget } = useGlobalStates();
+  const { isDropped, currentDragCategory, currentDropCategory } = useGlobalStates();
   const dropOptions: IDropOptions = {
     currentItemCategory: {
       level0: ['dropRef'],
@@ -22,8 +22,7 @@ export default function App() {
       level1: ['item 1', 'dropRef', 'item 3']
     },
     // disableCurrent 비활성화시 자식 요소 드래그 안 되는 현상 발생
-    // disableCurrent: false,
-    // applyToChildren: true
+    
   };
   const dragOptions2: IDragOptions = {
     currentItemCategory: {
@@ -45,7 +44,7 @@ export default function App() {
             id="item-container"
             ref={dropRef}
             onDragStart={e => console.log(dragInfo)}
-            onDrop={e => console.log(dropInfo)}
+            onDrop={e => console.log(isDropped, currentDragCategory, currentDropCategory)}
           >
             dropRef
             <div
