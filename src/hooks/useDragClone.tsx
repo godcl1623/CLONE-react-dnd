@@ -50,7 +50,7 @@ export default function useDragClone(option: IDragOptions): any[] {
   // updateDragTargetInfo(): 드래그 시작 대상 정보 업데이트를 위한 함수(정보 업데이트 로직)
   const updateDragTargetInfo = useCallback(
     (e: Event) => {
-      const currentDragMap = disableCurrent ? Object.values(dragMap).slice(1) : Object.values(dragMap);
+      const currentDragMap = Object.values(dragMap);
       const dragMapIncludesTarget = currentDragMap.find(level =>
         (level! as HTMLElement[]).includes(e.target! as HTMLElement)
       );
@@ -95,24 +95,24 @@ export default function useDragClone(option: IDragOptions): any[] {
   /* ############### 옵션에 따른 drag 활성화 ############### */
   useEffect(() => {
     const dragItemsCnt = dragRef.current! as HTMLElement;
-    if ((disableCurrent == null || disableCurrent) && (applyToChildren == null || applyToChildren)) {
-      // console.log('foo')
-      // console.log(disableCurrent == null || disableCurrent)
-      // 기본값: 자식 요소만 적용
+    // 기본값: 자식 요소만 적용(disableCurrent: 생략 혹은 false, applyToChildren: 생략 혹은 true)
+    if ((!disableCurrent || disableCurrent == null) && (applyToChildren || applyToChildren == null)) {
       dragItemsCnt.childNodes.forEach(item => {
         (item! as HTMLElement).draggable = isDraggable;
       });
-    } else if (!(disableCurrent == null || disableCurrent) && (applyToChildren == null || applyToChildren)) {
-      // console.log('bar')
-      // 컨테이너, 자식 요소 모두 적용
+    // 컨테이너, 자식 요소 모두 적용(disableCurrent: true 입력, applyToChildren: true 또는 생략)
+    } else if (disableCurrent && (applyToChildren == null || applyToChildren)) {
       dragItemsCnt.draggable = isDraggable;
-    } else if ((disableCurrent == null || disableCurrent) && !(applyToChildren == null || applyToChildren)) {
-      // console.log('doh')
-      // 컨테이너만 적용
+      dragItemsCnt.childNodes.forEach(item => {
+        (item! as HTMLElement).draggable = isDraggable;
+      });
+    // 컨테이너만 적용(disableCurrent: true 입력, applyToChildren: false 입력)
+    } else if (disableCurrent && !(applyToChildren == null || applyToChildren)) {
       dragItemsCnt.draggable = isDraggable;
       dragItemsCnt.childNodes.forEach(item => {
         (item! as HTMLElement).draggable = !isDraggable;
       });
+    // 그 외 경우 - 컨테이너, 자식 모두 비활성화
     } else {
       throw new Error('Invalid Option! Change the value of disableCurrent or applyToChildren!');
     }
@@ -121,14 +121,14 @@ export default function useDragClone(option: IDragOptions): any[] {
   /* ############### 드래그 대상 정보 업데이트 ############### */
   useEffect(() => {
     const dragItemsCnt = dragRef.current! as HTMLElement;
-    if ((disableCurrent == null || disableCurrent) && (applyToChildren == null || applyToChildren)) {
-      // 기본값: 자식 요소만 적용
+    // 기본값: 자식 요소만 적용(disableCurrent: 생략 혹은 false, applyToChildren: 생략 혹은 true)
+    if ((!disableCurrent || disableCurrent == null) && (applyToChildren || applyToChildren == null)) {
       dragItemsCnt.childNodes.forEach(item => item.addEventListener('dragstart', updateDragTargetInfo));
-    } else if (!(disableCurrent == null || disableCurrent) && (applyToChildren == null || applyToChildren)) {
-      // 컨테이너, 자식 요소 모두 적용
+    // 컨테이너, 자식 요소 모두 적용(disableCurrent: true 입력, applyToChildren: true 또는 생략)
+    } else if (disableCurrent && (applyToChildren == null || applyToChildren)) {
       dragItemsCnt.addEventListener('dragstart', updateDragTargetInfo);
-    } else if ((disableCurrent == null || disableCurrent) && !(applyToChildren == null || applyToChildren)) {
-      // 컨테이너만 적용
+    // 컨테이너만 적용(disableCurrent: true 입력, applyToChildren: false 입력)
+    } else if (disableCurrent && !(applyToChildren == null || applyToChildren)) {
       dragItemsCnt.addEventListener('dragstart', updateDragTargetInfo);
       dragItemsCnt.childNodes.forEach(item => {
         item.addEventListener('dragstart', (e: Event) => {

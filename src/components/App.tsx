@@ -21,8 +21,8 @@ export default function App() {
       level0: ['test 1'],
       level1: ['item 1', 'dropRef', 'item 3']
     },
-    // disableCurrent 비활성화시 자식 요소 드래그 안 되는 현상 발생
-    
+    disableCurrent: true,
+    // applyToChildren: false
   };
   const dragOptions2: IDragOptions = {
     currentItemCategory: {
