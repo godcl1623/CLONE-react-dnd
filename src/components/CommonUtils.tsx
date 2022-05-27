@@ -1,4 +1,4 @@
-import create, { State } from 'zustand';
+import create from 'zustand';
 import { devtools } from 'zustand/middleware';
 
 /* eslint-disable class-methods-use-this */
@@ -49,10 +49,6 @@ export class CommonUtils {
 }
 
 export const useStore = create<any>(devtools(set => ({
-  // currentDragTarget: null,
-  // setDragTgt(dragTarget: HTMLElement | null): void {
-  //   set({ currentDragTarget: dragTarget });
-  // },
   currentDragCategory: '',
   setDragCat(category: string): void {
     set({ currentDragCategory: category });

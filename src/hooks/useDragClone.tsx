@@ -12,10 +12,7 @@ type DragStartInfo = {
 
 export default function useDragClone(option: IDragOptions): any[] {
   /* ############### 전역 상태 ############### */
-  // const { isDropped, currentDragCategory, setDragTgt, setDragCat, setDropState } =
-  //   useStore();
-  const { isDropped, currentDragCategory, setDragCat, setDropState } =
-    useStore();
+  const { isDropped, currentDragCategory, setDragCat, setDropState } = useStore();
   /* ############### 지역 상태 ############### */
   const [isDraggable, makeDraggable] = useState(true);
   const [refresher, setRefresher] = useState();
@@ -28,8 +25,6 @@ export default function useDragClone(option: IDragOptions): any[] {
   const dragRef = useRef(null);
   /* ############### 카테고리 부여 등 기능 활용을 위한 클래스 인스턴스 ############### */
   const utils = new CommonUtils();
-
-  // const updateGlobalDragTarget = (dragTarget: HTMLElement) => setDragTgt(dragTarget);
 
   /* ############### 사용 옵션 목록 ############### */
   const { currentItemCategory, disableCurrent, applyToChildren } = option;
@@ -80,10 +75,6 @@ export default function useDragClone(option: IDragOptions): any[] {
     setRefresher,
     makeDraggable,
   };
-
-  // useEffect(() => {
-  //   console.log(dragMap)
-  // }, [dragMap])
 
   /* ############### 드래그 구조 업데이트 ############### */
   useEffect(() => {

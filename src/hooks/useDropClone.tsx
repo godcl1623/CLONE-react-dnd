@@ -3,7 +3,6 @@ import { BasicDndOptions, CommonUtils, useStore } from '../components/CommonUtil
 
 /* ############### 사용 타입 정리 ############### */
 // Hook 초기화용 props 타입
-// export type IDropOptions = Omit<BasicDndOptions, 'disableCurrent' | 'applyToChildren'>;
 export type IDropOptions = BasicDndOptions;
 // 디버깅용 정보 타입
 type __DebugDropResult = {
@@ -119,10 +118,6 @@ export default function useDropClone(option: IDropOptions): any {
     },
     [currentDragCategory, currentDropCategory]
   );
-
-  // useEffect(() => {
-  //   console.log(dropMap)
-  // }, [dropMap])
 
   /* ############### drop 구조 정리 ############### */
   useEffect(() => {
