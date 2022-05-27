@@ -7,28 +7,32 @@ import useGlobalStates from '../hooks/useGlobalStates';
 export default function App() {
   const drop = React.useRef<any>();
   const drag = React.useRef<any>();
-  const { currentDragTarget: dragTarget } = useGlobalStates();
+  const { isDropped, currentDragCategory, currentDropCategory } = useGlobalStates();
   const dropOptions: IDropOptions = {
     currentItemCategory: {
       level0: ['dropRef'],
       level1: ['item 1', 'item 2'],
-      level2: ['test3']
+      level2: ['test3', 'test4', 'test5', 'test6', 'test7', 'test8']
     },
-    applyToChildren: true
+    applyToChildren: false
   };
   const dragOptions: IDragOptions = {
     currentItemCategory: {
-      level0: ['test1', 'test2', 'test3', 'test4', 'test5', 'test6'],
+      level0: ['test 1'],
+      level1: ['item 1', 'dropRef', 'item 3']
+    },
+    disableCurrent: true,
+    // applyToChildren: false
+  };
+  const dragOptions2: IDragOptions = {
+    currentItemCategory: {
+      level0: ['test 2'],
+      level1: ['item 4', 'item 5', 'dropRef']
     }
   };
   const [dropRef, dropInfo, dropResult] = useDropClone(dropOptions);
   const [dragRef, dragInfo, setSettings] = useDragClone(dragOptions);
-  // const { updateGlobalDragTarget } = setSettings;
-  React.useEffect(() => {
-    if (drag.current) {
-      drag.current.childNodes.forEach((ele: any) => { ele.draggable = true });
-    }
-  }, [drag.current])
+  const [dragRef2, dragInfo2] = useDragClone(dragOptions2);
 
   return (
     <div id="App">
@@ -38,25 +42,30 @@ export default function App() {
         >
           <div
             id="item-container"
-            ref={el => {
-              dropRef.current = el;
-              dragRef.current = el;
-            }}
+            ref={dropRef}
             onDragStart={e => console.log(dragInfo)}
-            onDrop={e => console.log(dropInfo)}
+            onDrop={e => console.log(isDropped, currentDragCategory, currentDropCategory)}
           >
             dropRef
-            <div className="item cnt">
+            <div
+              className="item cnt 1"
+              ref={dragRef}
+            >
               item 1
-              <div className="item">item 3</div>
-              <div className="item">item 4</div>
-              <div className="item">item 5</div>
+              <div className="item 3">
+              </div>
+              <div className="item 4">item 4</div>
+              <div className="item 5">
+              </div>
             </div>
-            <div className="item cnt">
+            <div
+              className="item cnt 2"
+              ref={dragRef2}
+            >
               item 2
-              <div className="item">item 6</div>
-              <div className="item">item 7</div>
-              <div className="item">item 8</div>
+              <div className="item 6">item 6</div>
+              <div className="item 7">item 7</div>
+              <div className="item 8">item 8</div>
             </div>
           </div>
         </div>

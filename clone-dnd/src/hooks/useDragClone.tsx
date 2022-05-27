@@ -1,101 +1,80 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { BasicDndOptions, CommonUtils, useStore } from '../components/CommonUtils';
 
+/* ############### 사용 타입 정리 ############### */
+// Hook 초기화용 props 타입
 export type IDragOptions = BasicDndOptions;
-type DragInfo = {
-  startInfo: {
-    startEleInfo: DOMRect | null;
-    startCoords: DragEvent | null;
-  };
-  lastInfo: {
-    lastEleInfo: DOMRect | null;
-    lastCoords: DragEvent | null;
-  };
+// 드래그 시작 시점 정보 타입
+type DragStartInfo = {
+  startEleInfo: DOMRect | null;
+  startCoords: DragEvent | null;
 };
 
 export default function useDragClone(option: IDragOptions): any[] {
-  const { isDropped, currentDragCategory, setDragTgt, setDragCat, setDropState } = useStore();
+  /* ############### 전역 상태 ############### */
+  const { isDropped, currentDragCategory, setDragCat, setDropState } = useStore();
+  /* ############### 지역 상태 ############### */
   const [isDraggable, makeDraggable] = useState(true);
   const [refresher, setRefresher] = useState();
-  const [dragInfo, setdragInfo] = useState<DragInfo>({
-    startInfo: {
-      startEleInfo: null,
-      startCoords: null
-    },
-    lastInfo: {
-      lastEleInfo: null,
-      lastCoords: null
-    },
+  const [startInfo, setStartInfo] = useState<DragStartInfo>({
+    startEleInfo: null,
+    startCoords: null,
   });
   const [dragMap, setDragMap] = useState<any>(null);
+  /* ############### 드래그 컨테이너용 Ref ############### */
   const dragRef = useRef(null);
+  /* ############### 카테고리 부여 등 기능 활용을 위한 클래스 인스턴스 ############### */
   const utils = new CommonUtils();
 
-  const updateGlobalDragTarget = (dragTarget: HTMLElement) => setDragTgt(dragTarget);
+  /* ############### 사용 옵션 목록 ############### */
+  const { currentItemCategory, disableCurrent, applyToChildren } = option;
 
-  const {
-    currentItemCategory,
-    disableCurrent,
-    applyToChildren,
-  } = option;
-
-  const updateDragInfo = (
-    startEleInfo: DOMRect = dragInfo.startInfo.startEleInfo! as DOMRect,
-    startCoords: DragEvent = dragInfo.startInfo.startCoords! as DragEvent,
-    lastEleInfo: DOMRect = dragInfo.lastInfo.lastEleInfo! as DOMRect,
-    lastCoords: DragEvent = dragInfo.lastInfo.lastCoords! as DragEvent
+  /* ############### 내부 함수 ############### */
+  // updateStartInfo(): 드래그 시작 대상의 좌표 등 정보 업데이트(좌표 상태만)
+  const updateStartInfo = (
+    startEleInfo: DOMRect = startInfo.startEleInfo! as DOMRect,
+    startCoords: DragEvent = startInfo.startCoords! as DragEvent
   ): void => {
-    setdragInfo({
-      ...dragInfo,
-      startInfo: {
-        ...dragInfo.startInfo,
-        startEleInfo,
-        startCoords
-      },
-      lastInfo: {
-        ...dragInfo.lastInfo,
-        lastEleInfo,
-        lastCoords
-      }
+    setStartInfo({
+      ...startInfo,
+      startEleInfo,
+      startCoords,
     });
   };
 
+  // updateDragTargetInfo(): 드래그 시작 대상 정보 업데이트를 위한 함수(정보 업데이트 로직)
   const updateDragTargetInfo = useCallback(
     (e: Event) => {
-      const currentDragMap = disableCurrent ? Object.values(dragMap).slice(1) : Object.values(dragMap);
+      const currentDragMap = Object.values(dragMap);
       const dragMapIncludesTarget = currentDragMap.find(level =>
         (level! as HTMLElement[]).includes(e.target! as HTMLElement)
       );
+      const currentDragItemLvl = currentDragMap.indexOf(dragMapIncludesTarget);
       const currentDragItemIdx = (dragMapIncludesTarget! as HTMLElement[]).indexOf(e.target! as HTMLElement);
       if (currentItemCategory) {
-        const categoryList = Object.values(currentItemCategory)[0];
+        const categoryList = Object.values(currentItemCategory)[currentDragItemLvl];
         if (currentDragCategory !== categoryList[currentDragItemIdx]) {
-          setDragCat(categoryList[currentDragItemIdx]);
+          if (categoryList.length !== 1) {
+            setDragCat(categoryList[currentDragItemIdx]);
+          } else {
+            setDragCat(categoryList[0]);
+          }
         }
         if (isDropped) {
-          (setDropState(false));
+          setDropState(false);
         }
-        updateDragInfo((e.target! as HTMLElement).getBoundingClientRect(), e! as DragEvent);
+        updateStartInfo((e.target! as HTMLElement).getBoundingClientRect(), e! as DragEvent);
       }
     },
     [dragMap, isDropped, currentDragCategory]
   );
 
-  const updateDroppedTargetInfo = useCallback(
-    (e: Event) => {
-      if (isDropped) {
-        if (dragInfo.startInfo.startEleInfo) {
-          updateDragInfo(
-            dragInfo.startInfo.startEleInfo,
-            dragInfo.startInfo.startCoords! as DragEvent,
-            (e.target! as HTMLElement).getBoundingClientRect(),
-            e! as DragEvent
-          );
-        }
-      }
-    },
-    [isDropped]
-  );
+  // 사용자가 활용할 수 있는 도구 모음
+  const setSettings: any = {
+    // updateGlobalDragTarget,
+    setRefresher,
+    makeDraggable,
+  };
 
   /* ############### 드래그 구조 업데이트 ############### */
   useEffect(() => {
@@ -107,20 +86,24 @@ export default function useDragClone(option: IDragOptions): any[] {
   /* ############### 옵션에 따른 drag 활성화 ############### */
   useEffect(() => {
     const dragItemsCnt = dragRef.current! as HTMLElement;
-    if ((disableCurrent == null || disableCurrent) && (applyToChildren == null || applyToChildren)) {
-      // 기본값: 자식 요소만 적용
+    // 기본값: 자식 요소만 적용(disableCurrent: 생략 혹은 false, applyToChildren: 생략 혹은 true)
+    if ((!disableCurrent || disableCurrent == null) && (applyToChildren || applyToChildren == null)) {
       dragItemsCnt.childNodes.forEach(item => {
         (item! as HTMLElement).draggable = isDraggable;
       });
-    } else if (!(disableCurrent == null || disableCurrent) && (applyToChildren == null || applyToChildren)) {
-      // 컨테이너, 자식 요소 모두 적용
+    // 컨테이너, 자식 요소 모두 적용(disableCurrent: true 입력, applyToChildren: true 또는 생략)
+    } else if (disableCurrent && (applyToChildren == null || applyToChildren)) {
       dragItemsCnt.draggable = isDraggable;
-    } else if ((disableCurrent == null || disableCurrent) && !(applyToChildren == null || applyToChildren)) {
-      // 컨테이너만 적용
+      dragItemsCnt.childNodes.forEach(item => {
+        (item! as HTMLElement).draggable = isDraggable;
+      });
+    // 컨테이너만 적용(disableCurrent: true 입력, applyToChildren: false 입력)
+    } else if (disableCurrent && !(applyToChildren == null || applyToChildren)) {
       dragItemsCnt.draggable = isDraggable;
       dragItemsCnt.childNodes.forEach(item => {
         (item! as HTMLElement).draggable = !isDraggable;
       });
+    // 그 외 경우 - 컨테이너, 자식 모두 비활성화
     } else {
       throw new Error('Invalid Option! Change the value of disableCurrent or applyToChildren!');
     }
@@ -129,14 +112,14 @@ export default function useDragClone(option: IDragOptions): any[] {
   /* ############### 드래그 대상 정보 업데이트 ############### */
   useEffect(() => {
     const dragItemsCnt = dragRef.current! as HTMLElement;
-    if ((disableCurrent == null || disableCurrent) && (applyToChildren == null || applyToChildren)) {
-      // 기본값: 자식 요소만 적용
+    // 기본값: 자식 요소만 적용(disableCurrent: 생략 혹은 false, applyToChildren: 생략 혹은 true)
+    if ((!disableCurrent || disableCurrent == null) && (applyToChildren || applyToChildren == null)) {
       dragItemsCnt.childNodes.forEach(item => item.addEventListener('dragstart', updateDragTargetInfo));
-    } else if (!(disableCurrent == null || disableCurrent) && (applyToChildren == null || applyToChildren)) {
-      // 컨테이너, 자식 요소 모두 적용
+    // 컨테이너, 자식 요소 모두 적용(disableCurrent: true 입력, applyToChildren: true 또는 생략)
+    } else if (disableCurrent && (applyToChildren == null || applyToChildren)) {
       dragItemsCnt.addEventListener('dragstart', updateDragTargetInfo);
-    } else if ((disableCurrent == null || disableCurrent) && !(applyToChildren == null || applyToChildren)) {
-      // 컨테이너만 적용
+    // 컨테이너만 적용(disableCurrent: true 입력, applyToChildren: false 입력)
+    } else if (disableCurrent && !(applyToChildren == null || applyToChildren)) {
       dragItemsCnt.addEventListener('dragstart', updateDragTargetInfo);
       dragItemsCnt.childNodes.forEach(item => {
         item.addEventListener('dragstart', (e: Event) => {
@@ -153,32 +136,5 @@ export default function useDragClone(option: IDragOptions): any[] {
     };
   }, [updateDragTargetInfo]);
 
-  /* ############### 드롭 대상 정보 업데이트 ############### */
-  useEffect(() => {
-    const dragItemsCnt = dragRef.current! as HTMLElement;
-    if ((disableCurrent == null || disableCurrent) && (applyToChildren == null || applyToChildren)) {
-      // 기본값
-      dragItemsCnt.childNodes.forEach(item => item.addEventListener('dragend', updateDroppedTargetInfo));
-    } else if (!(disableCurrent == null || disableCurrent) && (applyToChildren == null || applyToChildren)) {
-      // 컨테이너, 자식 요소 모두 적용
-      dragItemsCnt.addEventListener('dragend', updateDroppedTargetInfo);
-    } else if ((disableCurrent == null || disableCurrent) && !(applyToChildren == null || applyToChildren)) {
-      // 컨테이너만 적용
-      dragItemsCnt.addEventListener('dragend', updateDroppedTargetInfo);
-      dragItemsCnt.childNodes.forEach(item =>
-        item.addEventListener('dragend', (e: Event) => {
-          e.preventDefault();
-          e.stopPropagation();
-        })
-      );
-    } else {
-      throw new Error('Invalid Option! Change the value of disableCurrent or applyToChildren!');
-    }
-    return () => {
-      dragItemsCnt.removeEventListener('dragend', updateDroppedTargetInfo);
-      dragItemsCnt.childNodes.forEach(item => item.removeEventListener('dragend', updateDroppedTargetInfo));
-    };
-  }, [updateDroppedTargetInfo]);
-
-  return [dragRef, updateGlobalDragTarget, dragInfo];
+  return [dragRef, startInfo, setSettings];
 }

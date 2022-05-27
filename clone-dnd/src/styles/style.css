@@ -38,7 +38,7 @@ html, body, #App, #dnd-test-zone {
 
 #item-container {
   display: flex;
-  flex-direction: column;
+  /* flex-direction: column; */
   justify-content: center;
   align-items: center;
   width: 100%;
@@ -52,4 +52,11 @@ html, body, #App, #dnd-test-zone {
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.item.cnt {
+  width: auto;
+  height: auto;
+  display: flex;
+  flex-direction: column;
 }
