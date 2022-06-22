@@ -1,15 +1,21 @@
 # clone-react-dnd
 
+<br/><br/>
+
 ## 애플리케이션 소개
 **clone-react-dnd**는 [React DnD](https://react-dnd.github.io/react-dnd/about) 라이브러리를 참고하여 만든 드래그 앤 드롭 라이브러리입니다.
 
 연산 수행 및 상태 관리 수행을 통해 사용자의 드래그 앤 드롭 기능 구현을 보조하는 것을 목적으로 하고 있습니다.
+
+<br/><br/>
 
 ## 목차
 * 기획 배경 및 상세 소개
 * 프로젝트 구조
 * 기능 명세 및 상세 화면
 * 기술 스택
+
+<br/><br/>
 
 ## 기획 배경 및 상세 소개
 * [libmanage-client](https://github.com/godcl1623/libmanage-client) 프로젝트를 진행하던 중 드래그 앤 드롭을 사용한 정렬 기능을 추가하고자 했습니다.
@@ -20,6 +26,9 @@
 
 * 참조한 라이브러리인 react-dnd를 참조하여 패키지 매니저를 통해 설치 및 사용하는 것을 상정하고 개발을 진행했습니다.
 	* 패키지 매니저를 통한 실제 배포는 진행하지 않았습니다.
+
+****
+<br/><br/>
 
 ## 프로젝트 구조
 ```
@@ -34,7 +43,13 @@
 │   │
 ```
 
+****
+<br/><br/>
+
 ## 사용 방법
+
+<br/><br/>
+
 <details>
 <summary>useDragClone</summary>
 <div markdown="1">
@@ -104,6 +119,8 @@
 </div>
 </details>
 
+<br/><br/>
+
 <details>
 <summary>useDropClone</summary>
 <div markdown="1">
@@ -165,6 +182,8 @@
 </div>
 </details>
 
+<br/><br/>
+
 <details>
 <summary>useGlobalStates</summary>
 <div markdown="1">
@@ -204,6 +223,18 @@
 </div>
 </details>
 
+<br/><br/>
+
+<details>
+<summary>useTouchDnd</summary>
+<div markdown="1">
+
+
+
+</div>
+</details>
+
+<br/><br/>
 
 ## 기술 스택
 * Front-End
