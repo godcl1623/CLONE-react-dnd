@@ -48,8 +48,6 @@
 
 ## 사용 방법
 
-<br/><br/>
-
 <details>
 <summary>useDragClone</summary>
 <div markdown="1">
@@ -119,7 +117,7 @@
 </div>
 </details>
 
-<br/><br/>
+<br/>
 
 <details>
 <summary>useDropClone</summary>
@@ -182,7 +180,7 @@
 </div>
 </details>
 
-<br/><br/>
+<br/>
 
 <details>
 <summary>useGlobalStates</summary>
@@ -223,7 +221,7 @@
 </div>
 </details>
 
-<br/><br/>
+<br/>
 
 <details>
 <summary>useTouchDnd</summary>
