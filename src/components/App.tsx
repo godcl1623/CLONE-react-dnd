@@ -1,12 +1,9 @@
-import React from 'react';
 import '../styles/style.css';
 import useDropClone, { IDropOptions } from '../hooks/useDropClone';
 import useDragClone, { IDragOptions } from '../hooks/useDragClone';
 import useGlobalStates from '../hooks/useGlobalStates';
 
 export default function App() {
-  const drop = React.useRef<any>();
-  const drag = React.useRef<any>();
   const { isDropped, currentDragCategory, currentDropCategory } = useGlobalStates();
   const dropOptions: IDropOptions = {
     currentItemCategory: {
@@ -22,7 +19,6 @@ export default function App() {
       level1: ['item 1', 'dropRef', 'item 3']
     },
     disableCurrent: true,
-    // applyToChildren: false
   };
   const dragOptions2: IDragOptions = {
     currentItemCategory: {
@@ -30,9 +26,9 @@ export default function App() {
       level1: ['item 4', 'item 5', 'dropRef']
     }
   };
-  const [dropRef, dropInfo, dropResult] = useDropClone(dropOptions);
-  const [dragRef, dragInfo, setSettings] = useDragClone(dragOptions);
-  const [dragRef2, dragInfo2] = useDragClone(dragOptions2);
+  const [dropRef] = useDropClone(dropOptions);
+  const [dragRef, dragInfo] = useDragClone(dragOptions);
+  const [dragRef2] = useDragClone(dragOptions2);
 
   return (
     <div id="App">
@@ -70,32 +66,6 @@ export default function App() {
           </div>
         </div>
       </div>
-      {/* <div
-        id="dropzone"
-        ref={dropRef}
-        onDrop={e => {
-          console.log(dragInfo.startCoords.clientY);
-          console.log(dropInfo.dropCoords.clientY);
-        }}
-      >
-        <div>drop point</div>
-      </div>
-      <div
-        className="cnt"
-        ref={dragRef}
-        onDrag={e => console.log('dragging', e.clientY)}
-        onDragEnd={e => console.log('dragEnd', e.clientY)}
-        onDragOver={e => e.preventDefault()}
-        onDrop={e => {
-          console.log(dragInfo);
-          console.log(dropInfo);
-        }}
-      >
-        <div className="item"></div>
-        <div className="item"></div>
-        <div className="item"></div>
-        <div className="item"></div>
-      </div> */}
     </div>
   );
 }

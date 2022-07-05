@@ -46,11 +46,9 @@ export default function useTouchDnd(styleOptions?: ITouchStyleOptions): any[] {
   const endTopCoord = useRef<number>(0);
   const fooRef = useRef<number[] | null>(null);
 
-  const sumAfterParse = (...args: string[]): any => {
-    return args
-      .map((size: string) => parseInt(size, 10))
-      .reduce((init: number, add: number) => init + add, 0);
-  };
+  const sumAfterParse = (...args: string[]): any => args
+    .map((size: string) => parseInt(size, 10))
+    .reduce((init: number, add: number) => init + add, 0);
 
   const makeTouchTgtClone = (
     touchEvt: React.TouchEvent,
